@@ -4,14 +4,13 @@
 
 char *name = MSGNAME;
 
+/* Moves up 1 row */
 void moverowup(void)
-    /* Moves up 1 row */
 {
     displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
     if (currow > toprow)
         currow--;
-    else if (toprow != 0)
-    {
+    else if (toprow != 0) {
         tscroll(DOWN, 1, LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
         displayrow(--toprow, NOUPDATE);
         currow--;
@@ -19,14 +18,13 @@ void moverowup(void)
     }
 } /* moverowup */
 
+/* Moves down one row */
 void moverowdown(void)
-    /* Moves down one row */
 {
     displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
     if (currow < bottomrow)
         currow++;
-    else if (bottomrow < (MAXROWS - 1))
-    {
+    else if (bottomrow < (MAXROWS - 1)) {
         tscroll(UP, 1, LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
         toprow++;
         currow++;
@@ -35,8 +33,8 @@ void moverowdown(void)
     }
 } /* moverowdown */
 
+/* Moves left one column */
 void movecolleft(void)
-    /* Moves left one column */
 {
     int col, oldleftcol;
     unsigned char oldcolstart[SCREENCOLS];
@@ -46,23 +44,21 @@ void movecolleft(void)
     displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
     if (curcol > leftcol)
         curcol--;
-    else if (leftcol != 0)
-    {
+    else if (leftcol != 0) {
         curcol--;
         leftcol--;
         setrightcol();
         setleftcol();
         if (oldleftcol <= rightcol)
-            tscroll(RIGHT, colstart[oldleftcol - leftcol] - LEFTMARGIN, LEFTMARGIN + 1,
-                    3, 80, SCREENROWS + 2, WHITE);
+        tscroll(RIGHT,colstart[oldleftcol-leftcol]-LEFTMARGIN,LEFTMARGIN+1,3,80,SCREENROWS+2,WHITE);
         clearlastcol();
         for (col = leftcol; col <= oldleftcol - 1; col++)
             displaycol(col, NOUPDATE);
     }
 } /* movecolleft */
 
+/* Moves right one column */
 void movecolright(void)
-    /* Moves right one column */
 {
     int col, oldleftcol, oldrightcol;
     unsigned char oldcolstart[SCREENCOLS];
@@ -73,30 +69,26 @@ void movecolright(void)
     displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
     if (curcol < rightcol)
         curcol++;
-    else if (rightcol < (MAXCOLS - 1))
-    {
+    else if (rightcol < (MAXCOLS - 1)) {
         curcol++;
         rightcol++;
         setleftcol();
         setrightcol();
         if (oldrightcol >= leftcol)
-            tscroll(LEFT, oldcolstart[leftcol - oldleftcol] - LEFTMARGIN,
-                    LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
+        tscroll(LEFT,oldcolstart[leftcol-oldleftcol]-LEFTMARGIN,LEFTMARGIN+1,3,80,SCREENROWS+2,WHITE);
         clearlastcol();
         for (col = oldrightcol + 1; col <= rightcol; col++)
             displaycol(col, NOUPDATE);
     }
 } /* movecolright */
 
+/* Recalculates all of the numbers in the spreadsheet */
 void recalc(void)
-    /* Recalculates all of the numbers in the speadsheet */
 {
     int col, row, dummy;
 
-    for (col = 0; col <= lastcol; col++)
-    {
-        for (row = 0; row <= lastrow; row++)
-        {
+    for (col = 0; col <= lastcol; col++) {
+        for (row = 0; row <= lastrow; row++) {
             if ((cell[col][row] != NULL) && (cell[col][row]->attrib == FORMULA))
                 cell[col][row]->v.f.fvalue = parse(cell[col][row]->v.f.formula, &dummy);
         }
@@ -104,8 +96,8 @@ void recalc(void)
     displayscreen(UPDATE);
 } /* recalc */
 
+/* Changes and prints the current AutoCalc value on the screen */
 void changeautocalc(int newmode)
-    /* Changes and prints the current AutoCalc value on the screen */
 {
     char s[15];
 
@@ -119,8 +111,8 @@ void changeautocalc(int newmode)
     writef(73, 1, MSGAUTOCALCCOLOR, strlen(MSGAUTOCALC), s);
 } /* autocalc */
 
+/* Changes and prints the current formula display value on the screen */
 void changeformdisplay(int newmode)
-    /* Changes and prints the current formula display value on the screen */
 {
     char s[15];
 
@@ -132,15 +124,14 @@ void changeformdisplay(int newmode)
     writef(65, 1, MSGFORMDISPLAYCOLOR, strlen(MSGFORMDISPLAY), s);
 } /* autocalc */
 
+/* Edits a selected cell */
 void editcell(CELLPTR ecell)
-    /* Edits a selected cell */
 {
     char s[MAXINPUT + 1];
 
     if (ecell == NULL)
         return;
-    switch(ecell->attrib)
-    {
+    switch(ecell->attrib) {
         case TEXT :
             strcpy(s, ecell->v.text);
             break;
@@ -160,13 +151,12 @@ void editcell(CELLPTR ecell)
     changed = TRUE;
 } /* editcell */
 
+/* Clears the current spreadsheet */
 void clearsheet(void)
-    /* Clears the current spreadsheet */
 {
     int col, row;
 
-    for (row = 0; row <= lastrow; row++)
-    {
+    for (row = 0; row <= lastrow; row++) {
         for (col = 0; col <= lastcol; col++)
             deletecell(col, row, NOUPDATE);
     }
@@ -186,25 +176,21 @@ void loadsheet(char *filename)
     int size, allocated, reallastcol = 0, reallastrow = 0, file;
     char check[81];
 
-    if (filename[0] == 0)
-    {
+    if (filename[0] == 0) {
         writeprompt(MSGFILENAME);
         if (!editstring(filename, "", MAXINPUT))
             return;
     }
-    if (access(filename, 0))
-    {
+    if (access(filename, 0)) {
         errormsg(MSGNOEXIST);
         return;
     }
-    if ((file = open(filename, O_RDWR | O_BINARY)) == -1)
-    {
+    if ((file = open(filename, O_RDWR | O_BINARY)) == -1) {
         errormsg(MSGNOOPEN);
         return;
     }
     read(file, check, strlen(name) + 1);
-    if (strcmp(check, name) != 0)
-    {
+    if (strcmp(check, name) != 0) {
         errormsg(MSGNOTURBOCALC);
         close(file);
         return;
@@ -217,16 +203,14 @@ void loadsheet(char *filename)
     read(file, (char *)&lastrow, 2);
     read(file, (char *)&size, 2);
     read(file, colwidth, sizeof(colwidth));
-    do
-    {
+    do {
         if (read(file, (char *)&curcol, 2) <= 0)
             break;
         read(file, (char *)&currow, 2);
         read(file, &format[curcol][currow], 1);
         read(file, (char *)&size, 2);
         read(file, (char *)&rec, size);
-        switch (rec.attrib)
-        {
+        switch (rec.attrib) {
             case TEXT :
                 if ((allocated = alloctext(curcol, currow, rec.v.text)) == TRUE)
                     setoflags(curcol, currow, NOUPDATE);
@@ -238,16 +222,14 @@ void loadsheet(char *filename)
                 allocated = allocformula(curcol, currow, rec.v.f.formula, rec.v.f.fvalue);
                 break;
         } /* switch */
-        if (!allocated)
-        {
+        if (!allocated) {
             errormsg(MSGFILELOMEM);
             lastrow = reallastrow;
             lastcol = reallastcol;
             format[curcol][currow] = DEFAULTFORMAT;
             break;
         }
-        else
-        {
+        else {
             if (curcol > reallastcol)
                 reallastcol = curcol;
             if (currow > reallastrow)
@@ -265,8 +247,8 @@ void loadsheet(char *filename)
     changed = FALSE;
 } /* loadsheet */
 
+/* Saves the current spreadsheet */
 void savesheet(void)
-    /* Saves the current spreadsheet */
 {
     char filename[MAXINPUT+1], eof = 26;
     int size, col, row, overwrite, file;
@@ -276,14 +258,11 @@ void savesheet(void)
     writeprompt(MSGFILENAME);
     if (!editstring(filename, "", MAXINPUT))
         return;
-    if (!access(filename, 0))
-    {
+    if (!access(filename, 0)) {
         if (!getyesno(&overwrite, MSGOVERWRITE) || (overwrite == 'N'))
             return;
     }
-    if ((file = open(filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
-                    S_IREAD | S_IWRITE)) == -1)
-    {
+    if ((file = open(filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, S_IREAD | S_IWRITE)) == -1) {
         errormsg(MSGNOOPEN);
         return;
     }
@@ -296,18 +275,14 @@ void savesheet(void)
     size = MAXCOLS;
     write(file, (char *)&size, 2);
     write(file, colwidth, sizeof(colwidth));
-    for (row = 0; row <= lastrow; row++)
-    {
-        for (col = lastcol; col >= 0; col--)
-        {
-            if (cell[col][row] != NULL)
-            {
+    for (row = 0; row <= lastrow; row++) {
+        for (col = lastcol; col >= 0; col--) {
+            if (cell[col][row] != NULL) {
                 write(file, (char *)&col, 2);
                 write(file, (char *)&row, 2);
                 write(file, (char *)&format[col][row], 1);
                 cellptr = cell[col][row];
-                switch(cellptr->attrib)
-                {
+                switch(cellptr->attrib) {
                     case TEXT :
                         size = strlen(cellptr->v.text) + 2;
                         break;
@@ -329,8 +304,8 @@ void savesheet(void)
     changed = FALSE;
 } /* savesheet */
 
+/* Returns the number of rows to print */
 int pagerows(int row, int toppage, int border)
-    /* Returns the number of rows to print */
 {
     int rows;
 
@@ -343,8 +318,8 @@ int pagerows(int row, int toppage, int border)
         return(rows);
 } /* pagerows */
 
+/* Returns the number of columns to print starting at col */
 int pagecols(int col, int border, int columns)
-    /* Returns the number of columns to print starting at col */
 {
     int len = ((col == 0) && (border)) ? columns - LEFTMARGIN : columns;
     int firstcol = col;
@@ -356,13 +331,12 @@ int pagecols(int col, int border, int columns)
     return(col - firstcol);
 } /* pagecols */
 
+/* Prints a copy of the spreadsheet to a file or to the printer */
 void printsheet(void)
-    /* Prints a copy of the spreadsheet to a file or to the printer */
 {
     char filename[MAXINPUT + 1], s[133], colstr[MAXCOLWIDTH + 1];
     FILE *file;
-    int columns, counter1, counter2, counter3, col = 0, row, border, toppage,
-        lcol, lrow, dummy, printed, oldlastcol;
+    int columns, counter1, counter2, counter3, col = 0, row, border, toppage, lcol, lrow, dummy, printed, oldlastcol;
 
     filename[0] = 0;
     writeprompt(MSGPRINT);
@@ -370,16 +344,13 @@ void printsheet(void)
         return;
     if (filename[0] == 0)
         strcpy(filename, "PRN");
-    if ((file = fopen(filename, "wt")) == NULL)
-    {
+    if ((file = fopen(filename, "wt")) == NULL) {
         errormsg(MSGNOOPEN);
         return;
     }
     oldlastcol = lastcol;
-    for (counter1 = 0; counter1 <= lastrow; counter1++)
-    {
-        for (counter2 = lastcol; counter2 < MAXCOLS; counter2++)
-        {
+    for (counter1 = 0; counter1 <= lastrow; counter1++) {
+        for (counter2 = lastcol; counter2 < MAXCOLS; counter2++) {
             if (format[counter2][counter1] >= OVERWRITE)
                 lastcol = counter2;
         }
@@ -390,33 +361,26 @@ void printsheet(void)
     if (!getyesno(&border, MSGBORDER))
         return;
     border = (border == 'Y');
-    while (col <= lastcol)
-    {
+    while (col <= lastcol) {
         row = 0;
         toppage = TRUE;
         lcol = pagecols(col, border, columns) + col;
-        while (row <= lastrow)
-        {
+        while (row <= lastrow) {
             lrow = pagerows(row, toppage, border) + row;
             printed = 0;
-            if (toppage)
-            {
-                for (counter1 = 0; counter1 < TOPMARGIN; counter1++)
-                {
+            if (toppage) {
+                for (counter1 = 0; counter1 < TOPMARGIN; counter1++) {
                     fprintf(file, "\n");
                     printed++;
                 }
             }
-            for (counter1 = row; counter1 < lrow; counter1++)
-            {
-                if ((border) && (counter1 == row) && (toppage))
-                {
+            for (counter1 = row; counter1 < lrow; counter1++) {
+                if ((border) && (counter1 == row) && (toppage)) {
                     if ((col == 0) && (border))
                         sprintf(s, "%*s", LEFTMARGIN, "");
                     else
                         s[0] = 0;
-                    for (counter3 = col; counter3 < lcol; counter3++)
-                    {
+                    for (counter3 = col; counter3 < lcol; counter3++) {
                         centercolstring(counter3, colstr);
                         strcat(s, colstr);
                     }
@@ -443,8 +407,8 @@ void printsheet(void)
     lastcol = oldlastcol;
 } /* printsheet */
 
+/* Sets the new column width for a selected column */
 void setcolwidth(int col)
-    /* Sets the new column width for a selected column */
 {
     int width, row;
 
@@ -453,14 +417,12 @@ void setcolwidth(int col)
         return;
     colwidth[col] = width;
     setrightcol();
-    if (rightcol < col)
-    {
+    if (rightcol < col) {
         rightcol = col;
         setleftcol();
         setrightcol();
     }
-    for (row = 0; row <= lastrow; row++)
-    {
+    for (row = 0; row <= lastrow; row++) {
         if ((cell[col][row] != NULL) && (cell[col][row]->attrib == TEXT))
             clearoflags(col + 1, row, NOUPDATE);
         else
@@ -471,8 +433,8 @@ void setcolwidth(int col)
     changed = TRUE;
 } /* setcolwidth */
 
+/* Moves to a selected cell */
 void gotocell()
-    /* Moves to a selected cell */
 {
     writeprompt(MSGGOTO);
     if (!getcell(&curcol, &currow))
@@ -485,8 +447,8 @@ void gotocell()
     displayscreen(NOUPDATE);
 } /* gotocell */
 
+/* Prompts the user for a selected format and range of cells */
 void formatcells(void)
-    /* Prompts the user for a selected format and range of cells */
 {
     int col, row, col1, col2, row1, row2, temp, newformat = 0;
 
@@ -498,8 +460,7 @@ void formatcells(void)
         return;
     if ((col1 != col2) && (row1 != row2))
         errormsg(MSGDIFFCOLROW);
-    else
-    {
+    else {
         if (col1 > col2)
             swap(&col1, &col2);
         if (row1 > row2)
@@ -515,17 +476,14 @@ void formatcells(void)
         newformat += (temp == 'Y') * COMMAS;
         if (newformat & DOLLAR)
             newformat += 2;
-        else
-        {
+        else {
             writeprompt(MSGPLACES);
             if (!getint(&temp, 0, MAXPLACES))
                 return;
             newformat += temp;
         }
-        for (col = col1; col <= col2; col++)
-        {
-            for (row = row1; row <= row2; row++)
-            {
+        for (col = col1; col <= col2; col++) {
+            for (row = row1; row <= row2; row++) {
                 format[col][row] = (format[col][row] & OVERWRITE) | newformat;
                 if ((col >= leftcol) && (col <= rightcol) &&
                         (row >= toprow) && (row <= bottomrow))
@@ -536,18 +494,16 @@ void formatcells(void)
     changed = TRUE;
 } /* formatcells */
 
+/* Deletes a column */
 void deletecol(int col)
-    /* Deletes a column */
 {
     int counter, row;
 
     for (counter = 0; counter <= lastrow; counter++)
         deletecell(col, counter, NOUPDATE);
     printfreemem();
-    if (col != MAXCOLS - 1)
-    {
-        movmem(&cell[col + 1][0], &cell[col][0], MAXROWS * sizeof(CELLPTR) *
-                (MAXCOLS - col - 1));
+    if (col != MAXCOLS - 1) {
+        movmem(&cell[col + 1][0], &cell[col][0], MAXROWS * sizeof(CELLPTR) * (MAXCOLS - col - 1));
         movmem(&format[col + 1][0], &format[col][0], MAXROWS * (MAXCOLS - col - 1));
         movmem(&colwidth[col + 1], &colwidth[col], MAXCOLS - col - 1);
     }
@@ -557,16 +513,13 @@ void deletecol(int col)
     if ((lastcol >= col) && (lastcol > 0))
         lastcol--;
     setrightcol();
-    if (curcol > rightcol)
-    {
+    if (curcol > rightcol) {
         rightcol++;
         setleftcol();
     }
     clearlastcol();
-    for (counter = 0; counter <= lastcol; counter++)
-    {
-        for (row = 0; row <= lastrow; row++)
-        {
+    for (counter = 0; counter <= lastcol; counter++) {
+        for (row = 0; row <= lastrow; row++) {
             if ((cell[counter][row] != NULL) &&
                     (cell[counter][row]->attrib == FORMULA))
                 fixformula(counter, row, COLDEL, col);
@@ -579,21 +532,18 @@ void deletecol(int col)
     recalc();
 } /* deletecol */
 
+/* Inserts a column */
 void insertcol(int col)
-    /* Inserts a column */
 {
     int counter, row;
 
-    if (lastcol == MAXCOLS - 1)
-    {
+    if (lastcol == MAXCOLS - 1) {
         for (counter = 0; counter <= lastrow; counter++)
             deletecell(lastcol, counter, NOUPDATE);
         printfreemem();
     }
-    if (col != MAXCOLS - 1)
-    {
-        movmem(&cell[col][0], &cell[col + 1][0], MAXROWS * sizeof(CELLPTR) *
-                (MAXCOLS - col - 1));
+    if (col != MAXCOLS - 1) {
+        movmem(&cell[col][0], &cell[col + 1][0], MAXROWS * sizeof(CELLPTR) * (MAXCOLS - col - 1));
         movmem(&format[col][0], &format[col + 1][0], MAXROWS * (MAXCOLS - col - 1));
         movmem(&colwidth[col], &colwidth[col + 1], MAXCOLS - col - 1);
     }
@@ -603,15 +553,12 @@ void insertcol(int col)
     lastcol = MAXCOLS - 1;
     setlastcol();
     setrightcol();
-    if (curcol > rightcol)
-    {
+    if (curcol > rightcol) {
         rightcol++;
         setleftcol();
     }
-    for (counter = 0; counter <= lastcol; counter++)
-    {
-        for (row = 0; row <= lastrow; row++)
-        {
+    for (counter = 0; counter <= lastcol; counter++) {
+        for (row = 0; row <= lastrow; row++) {
             if ((cell[counter][row] != NULL) &&
                     (cell[counter][row]->attrib == FORMULA))
                 fixformula(counter, row, COLADD, col);
@@ -624,37 +571,31 @@ void insertcol(int col)
     recalc();
 } /* insertcol */
 
+/* Deletes a row */
 void deleterow(int row)
-    /* Deletes a row */
 {
     int counter, rowc;
 
     for (counter = 0; counter <= lastcol; counter++)
         deletecell(counter, row, NOUPDATE);
     printfreemem();
-    if (row != MAXROWS - 1)
-    {
-        for (counter = 0; counter < MAXCOLS; counter++)
-        {
+    if (row != MAXROWS - 1) {
+        for (counter = 0; counter < MAXCOLS; counter++) {
             movmem(&cell[counter][row + 1], &cell[counter][row],
                     sizeof(CELLPTR) * (MAXROWS - row - 1));
             movmem(&format[counter][row + 1], &format[counter][row], MAXROWS - row - 1);
         }
     }
-    else
-    {
-        for (counter = 0; counter <= lastcol; counter++)
-        {
+    else {
+        for (counter = 0; counter <= lastcol; counter++) {
             cell[counter][MAXROWS - 1] = NULL;
             format[counter][MAXROWS - 1] = DEFAULTFORMAT;
         }
     }
     if ((lastrow >= row) && (lastrow > 0))
         lastrow--;
-    for (counter = 0; counter <= lastcol; counter++)
-    {
-        for (rowc = 0; rowc <= lastrow; rowc++)
-        {
+    for (counter = 0; counter <= lastcol; counter++) {
+        for (rowc = 0; rowc <= lastrow; rowc++) {
             if ((cell[counter][rowc] != NULL) &&
                     (cell[counter][rowc]->attrib == FORMULA))
                 fixformula(counter, rowc, ROWDEL, row);
@@ -666,37 +607,30 @@ void deleterow(int row)
     recalc();
 } /* deleterow */
 
+/* Inserts a row */
 void insertrow(int row)
-    /* Inserts a row */
 {
     int counter, rowc;
 
-    if (lastrow == MAXROWS - 1)
-    {
+    if (lastrow == MAXROWS - 1) {
         for (counter = 0; counter <= lastcol; counter++)
             deletecell(counter, lastrow, NOUPDATE);
         printfreemem();
     }
-    if (row != MAXROWS - 1)
-    {
-        for (counter = 0; counter < MAXCOLS; counter++)
-        {
-            movmem(&cell[counter][row], &cell[counter][row + 1],
-                    sizeof(CELLPTR) * (MAXROWS - row - 1));
+    if (row != MAXROWS - 1) {
+        for (counter = 0; counter < MAXCOLS; counter++) {
+            movmem(&cell[counter][row], &cell[counter][row + 1], sizeof(CELLPTR) * (MAXROWS - row - 1));
             movmem(&format[counter][row], &format[counter][row + 1], MAXROWS - row - 1);
         }
     }
-    for (counter = 0; counter < MAXCOLS; counter++)
-    {
+    for (counter = 0; counter < MAXCOLS; counter++) {
         cell[counter][row] = NULL;
         format[counter][row] = DEFAULTFORMAT;
     }
     lastrow = MAXROWS - 1;
     setlastrow();
-    for (counter = 0; counter <= lastcol; counter++)
-    {
-        for (rowc = 0; rowc <= lastrow; rowc++)
-        {
+    for (counter = 0; counter <= lastcol; counter++) {
+        for (rowc = 0; rowc <= lastrow; rowc++) {
             if ((cell[counter][rowc] != NULL) &&
                     (cell[counter][rowc]->attrib == FORMULA))
                 fixformula(counter, rowc, ROWADD, row);
@@ -708,14 +642,13 @@ void insertrow(int row)
     recalc();
 } /* insertrow */
 
+/* Executes the commands in the spreadsheet menu */
 void smenu(void)
-    /* Executes the commands in the spreadsheet menu */
 {
     char filename[MAXINPUT + 1];
 
     filename[0] = 0;
-    switch(getcommand(SMENU, SCOMMAND))
-    {
+    switch(getcommand(SMENU, SCOMMAND)) {
         case 0 :
             checkforsave();
             loadsheet(filename);
@@ -733,11 +666,10 @@ void smenu(void)
     } /* switch */
 } /* smenu */
 
+/* Executes the commands in the column menu */
 void cmenu(void)
-    /* Executes the commands in the column menu */
 {
-    switch(getcommand(CMENU, CCOMMAND))
-    {
+    switch(getcommand(CMENU, CCOMMAND)) {
         case 0 :
             insertcol(curcol);
             break;
@@ -750,11 +682,10 @@ void cmenu(void)
     } /* switch */
 } /* cmenu */
 
+/* Executes the commands in the row menu */
 void rmenu(void)
-    /* Executes the commands in the row menu */
 {
-    switch(getcommand(RMENU, RCOMMAND))
-    {
+    switch(getcommand(RMENU, RCOMMAND)) {
         case 0 :
             insertrow(currow);
             break;
@@ -764,11 +695,10 @@ void rmenu(void)
     } /* switch */
 } /* rmenu */
 
+/* Executes the commands in the utility menu */
 void umenu(void)
-    /* Executes the commands in the utility menu */
 {
-    switch(getcommand(UMENU, UCOMMAND))
-    {
+    switch(getcommand(UMENU, UCOMMAND)) {
         case 0 :
             recalc();
             break;
@@ -779,11 +709,10 @@ void umenu(void)
     } /* switch */
 } /* umenu */
 
+/* Executes the commands in the main menu */
 void mainmenu(void)
-    /* Executes the commands in the main menu */
 {
-    switch(getcommand(MENU, COMMAND))
-    {
+    switch(getcommand(MENU, COMMAND)) {
         case 0 :
             smenu();
             break;

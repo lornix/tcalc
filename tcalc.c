@@ -24,14 +24,12 @@ void run()
 {
     int input;
 
-    do
-    {
+    do {
         displaycell(curcol, currow, HIGHLIGHT, NOUPDATE);
         curcell = cell[curcol][currow];
         showcelltype();
         input = getkey();
-        switch(input)
-        {
+        switch(input) {
             case '/' :
                 mainmenu();
                 break;
@@ -52,8 +50,7 @@ void run()
                 currow -= 20;
                 if (currow < 0)
                     currow = toprow = 0;
-                else if (toprow < 0)
-                {
+                else if (toprow < 0) {
                     currow -= toprow;
                     toprow = 0;
                 }
@@ -63,13 +60,11 @@ void run()
             case PGDNKEY :
                 toprow += 20;
                 currow += 20;
-                if ((currow >= MAXROWS) && (toprow >= MAXROWS))
-                {
+                if ((currow >= MAXROWS) && (toprow >= MAXROWS)) {
                     currow = MAXROWS - 1;
                     toprow = MAXROWS - 20;
                 }
-                else if (toprow > (MAXROWS - 20))
-                {
+                else if (toprow > (MAXROWS - 20)) {
                     currow -= (toprow + 20 - MAXROWS);
                     toprow = MAXROWS - 20;
                 }
@@ -80,8 +75,7 @@ void run()
                 displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
                 if (leftcol == 0)
                     curcol = 0;
-                else
-                {
+                else {
                     curcol = rightcol = leftcol - 1;
                     setleftcol();
                     setrightcol();
@@ -92,8 +86,7 @@ void run()
                 displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
                 if (rightcol == MAXCOLS - 1)
                     curcol = rightcol;
-                else
-                {
+                else {
                     curcol = leftcol = rightcol + 1;
                     setrightcol();
                     setleftcol();

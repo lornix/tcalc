@@ -113,12 +113,10 @@
 struct CELLREC
 {
     char attrib;
-    union
-    {
+    union {
         char text[MAXINPUT + 1];
         double value;
-        struct
-        {
+        struct {
             double fvalue;
             char formula[MAXINPUT + 1];
         } f;

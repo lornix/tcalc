@@ -20,11 +20,9 @@
 struct TOKENREC
 {
     char state;
-    union
-    {
+    union {
         double value;
-        struct
-        {
+        struct {
             int row, col;
         } c;
         char funcname[MAXFUNCNAMELEN + 1];
@@ -46,8 +44,7 @@ int isfunc(char *s)
 {
     int len = strlen(s);
 
-    if (strncmp(s, input, len) == 0)
-    {
+    if (strncmp(s, input, len) == 0) {
         strncpy(curtoken.x.funcname, input, len);
         curtoken.x.funcname[len] = 0;
         input += len;
@@ -66,14 +63,12 @@ int nexttoken(void)
         input++;
     if (*input == 0)
         return(EOLN);
-    if (strchr("0123456789.", *input))
-    {
+    if (strchr("0123456789.", *input)) {
         start = input;
         len = 0;
         decimal = FALSE;
         while ((isdigit(*input)) ||
-                ((*input == '.') && (!decimal)))
-        {
+                ((*input == '.') && (!decimal))) {
             if (*input == '.')
                 decimal = TRUE;
             input++;
@@ -81,18 +76,15 @@ int nexttoken(void)
         }
         if ((len == 1) && (start[0] == '.'))
             return(BAD);
-        if (*input == 'E')
-        {
+        if (*input == 'E') {
             input++;
             len++;
-            if (strchr("+-", *input) != NULL)
-            {
+            if (strchr("+-", *input) != NULL) {
                 input++;
                 len++;
             }
             numlen = 0;
-            while ((isdigit(*input)) && (++numlen <= 3))
-            {
+            while ((isdigit(*input)) && (++numlen <= 3)) {
                 input++;
                 len++;
             }
@@ -104,8 +96,7 @@ int nexttoken(void)
             return(BAD);
         return(NUM);
     }
-    else if (isalpha(*input))
-    {
+    else if (isalpha(*input)) {
         if
             (isfunc("ABS") ||
              isfunc("ACOS") ||
@@ -126,16 +117,14 @@ int nexttoken(void)
              isfunc("TAN") ||
              isfunc("TRUNC"))
                 return(FUNC);
-        if (formulastart(&input, &curtoken.x.c.col, &curtoken.x.c.row))
-        {
+        if (formulastart(&input, &curtoken.x.c.col, &curtoken.x.c.row)) {
             isformula = TRUE;
             return(CELL);
         }
         else
             return(BAD);
     }
-    else switch(*(input++))
-    {
+    else switch(*(input++)) {
         case '+' : return(PLUS);
         case '-' : return(MINUS);
         case '*' : return(TIMES);
@@ -151,8 +140,7 @@ int nexttoken(void)
 void push(struct TOKENREC *token)
     /* Pushes a new token onto the stack */
 {
-    if (stacktop == PARSERSTACKSIZE - 1)
-    {
+    if (stacktop == PARSERSTACKSIZE - 1) {
         errormsg(MSGSTACKERROR);
         error = TRUE;
     }
@@ -171,19 +159,15 @@ int gotostate(int production)
 {
     int state = stack[stacktop].state;
 
-    if (production <= 3)
-    {
-        switch(state)
-        {
+    if (production <= 3) {
+        switch(state) {
             case 0 : return(1);
             case 9 : return(19);
             case 20 : return(28);
         } /* switch */
     }
-    else if (production <= 6)
-    {
-        switch(state)
-        {
+    else if (production <= 6) {
+        switch(state) {
             case 0 :
             case 9 :
             case 20 : return(2);
@@ -191,10 +175,8 @@ int gotostate(int production)
             case 13 : return(22);
         } /* switch */
     }
-    else if (production <= 8)
-    {
-        switch(state)
-        {
+    else if (production <= 8) {
+        switch(state) {
             case 0 :
             case 9 :
             case 12 :
@@ -205,10 +187,8 @@ int gotostate(int production)
             case 16 : return(25);
         } /* switch */
     }
-    else if (production <= 10)
-    {
-        switch(state)
-        {
+    else if (production <= 10) {
+        switch(state) {
             case 0 :
             case 9 :
             case 12 :
@@ -219,10 +199,8 @@ int gotostate(int production)
             case 20 : return(4);
         } /* switch */
     }
-    else if (production <= 12)
-    {
-        switch(state)
-        {
+    else if (production <= 12) {
+        switch(state) {
             case 0 :
             case 9 :
             case 12 :
@@ -234,10 +212,8 @@ int gotostate(int production)
             case 5 : return(17);
         } /* switch */
     }
-    else
-    {
-        switch(state)
-        {
+    else {
+        switch(state) {
             case 0 :
             case 5 :
             case 9 :
@@ -278,8 +254,7 @@ void reduce(int reduction)
     struct TOKENREC token1, token2;
     int counter;
 
-    switch (reduction)
-    {
+    switch (reduction) {
         case 1 :
             token1 = pop();
             pop();
@@ -323,22 +298,18 @@ void reduce(int reduction)
             pop();
             token2 = pop();
             curtoken.x.value = 0;
-            if (token1.x.c.row == token2.x.c.row)
-            {
+            if (token1.x.c.row == token2.x.c.row) {
                 if (token1.x.c.col < token2.x.c.col)
                     error = TRUE;
-                else
-                {
+                else {
                     for (counter = token2.x.c.col; counter <= token1.x.c.col; counter++)
                         curtoken.x.value += cellvalue(counter, token1.x.c.row);
                 }
             }
-            else if (token1.x.c.col == token2.x.c.col)
-            {
+            else if (token1.x.c.col == token2.x.c.col) {
                 if (token1.x.c.row < token2.x.c.row)
                     error = TRUE;
-                else
-                {
+                else {
                     for (counter = token2.x.c.row; counter <= token1.x.c.row; counter++)
                         curtoken.x.value += cellvalue(token1.x.c.col, counter);
                 }
@@ -428,10 +399,8 @@ double parse(char *s, int *att)
     firsttoken.x.value = 0;
     push(&firsttoken);
     tokentype = nexttoken();
-    do
-    {
-        switch (stack[stacktop].state)
-        {
+    do {
+        switch (stack[stacktop].state) {
             case 0 :
             case 9 :
             case 12 :
@@ -582,8 +551,7 @@ double parse(char *s, int *att)
         } /* switch */
     }
     while ((!accepted) && (!error));
-    if (error)
-    {
+    if (error) {
         *att = TEXT;
         return(0);
     }

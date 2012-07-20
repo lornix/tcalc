@@ -21,12 +21,10 @@ int editstring(char *s, char *legal, int maxlength)
     int c, len = strlen(s), pos = len, insert = TRUE;
 
     changecursor(insert);
-    do
-    {
+    do {
         writef(1, 25, WHITE, 79, "%s", s);
         gotoxy(pos + 1, 25);
-        switch(c = getkey())
-        {
+        switch(c = getkey()) {
             case HOMEKEY :
                 pos = 0;
                 break;
@@ -46,16 +44,14 @@ int editstring(char *s, char *legal, int maxlength)
                     pos++;
                 break;
             case BS :
-                if (pos > 0)
-                {
+                if (pos > 0) {
                     movmem(&s[pos], &s[pos - 1], len - pos + 1);
                     pos--;
                     len--;
                 }
                 break;
             case DELKEY :
-                if (pos < len)
-                {
+                if (pos < len) {
                     movmem(&s[pos + 1], &s[pos], len - pos);
                     len--;
                 }
@@ -74,10 +70,8 @@ int editstring(char *s, char *legal, int maxlength)
             default :
                 if (((legal[0] == 0) || (strchr(legal, c) != NULL)) &&
                         ((c >= ' ') && (c <= '~')) &&
-                        (len < maxlength))
-                {
-                    if (insert)
-                    {
+                        (len < maxlength)) {
+                    if (insert) {
                         memmove(&s[pos + 1], &s[pos], len - pos + 1);
                         len++;
                     }
@@ -117,8 +111,7 @@ int getint(int *number, int low, int high)
 
     s[0] = 0;
     sprintf(message, MSGBADNUMBER, low, high);
-    do
-    {
+    do {
         if (!editstring(s, "1234567890", 4))
             return(FALSE);
         i = atoi(s);
@@ -138,31 +131,26 @@ int getcell(int *col, int *row)
     char data[10], *input, *start, numstring[6];
 
     data[0] = 0;
-    do
-    {
+    do {
         if (!first)
             errormsg(MSGBADCELL);
         first = FALSE;
         input = data;
-        if (!editstring(data, "", numlen + 2))
-        {
+        if (!editstring(data, "", numlen + 2)) {
             *col = oldcol;
             *row = oldrow;
             return(FALSE);
         }
         *col = toupper(*(input++)) - 'A';
-        if (isalpha(*input))
-        {
+        if (isalpha(*input)) {
             *col *= 26;
             *col += toupper(*(input++)) - 'A' + 26;
         }
         if (*col >= MAXCOLS)
             continue;
         start = input;
-        for (len = 0; len < numlen; len++)
-        {
-            if (!isdigit(*(input++)))
-            {
+        for (len = 0; len < numlen; len++) {
+            if (!isdigit(*(input++))) {
                 input--;
                 break;
             }
@@ -186,11 +174,9 @@ int getyesno(int *yesno, char *prompt)
 {
     writeprompt(prompt);
     setcursor(shortcursor);
-    do
-    {
+    do {
         *yesno = toupper(getkey());
-        if (*yesno == ESC)
-        {
+        if (*yesno == ESC) {
             setcursor(nocursor);
             return(FALSE);
         }

@@ -2,8 +2,8 @@
 
 #include "tcalc.h"
 
+/* Allocates space for a text cell */
 int alloctext(int col, int row, char *s)
-    /* Allocates space for a text cell */
 {
     int size;
     CELLPTR cellptr;
@@ -18,8 +18,8 @@ int alloctext(int col, int row, char *s)
     return(TRUE);
 } /* alloctext */
 
+/* Allocates space for a value cell */
 int allocvalue(int col, int row, double amt)
-    /* Allocates space for a value cell */
 {
     CELLPTR cellptr;
 
@@ -33,8 +33,8 @@ int allocvalue(int col, int row, double amt)
     return(TRUE);
 } /* allocvalue */
 
+/* Allocates space for a formula cell */
 int allocformula(int col, int row, char *s, double amt)
-    /* Allocates space for a formula cell */
 {
     int size;
     CELLPTR cellptr;
@@ -50,15 +50,14 @@ int allocformula(int col, int row, char *s, double amt)
     return(TRUE);
 } /* allocformula */
 
+/* Deletes a cell */
 void deletecell(int col, int row, int display)
-    /* Deletes a cell */
 {
     CELLPTR cellptr = cell[col][row];
 
     if (cellptr == NULL)
         return;
-    switch (cellptr->attrib)
-    {
+    switch (cellptr->attrib) {
         case TEXT :
             memleft += textcellsize(cellptr->v.text);
             clearoflags(col + 1, row, display);
@@ -81,22 +80,21 @@ void deletecell(int col, int row, int display)
     changed = TRUE;
 } /* deletecell */
 
+/* Prints the amount of free memory */
 void printfreemem(void)
-    /* Prints the amount of free memory */
 {
     writef(strlen(MSGMEMORY) + 2, 1, MEMORYCOLOR, 6, "%6ld", memleft);
 } /* printfreemem */
 
+/* Returns the width in spaces of row */
 int rowwidth(int row)
-    /* Returns the width in spaces of row */
 {
     return((row == 0) ? 1 : (int)log10(row + 1) + 1);
 } /* rowwidth */
 
+/* Returns TRUE if the string is the start of a formula, FALSE otherwise.
+    Also returns the column and row of the formula. */
 int formulastart(char **input, int *col, int *row)
-    /* Returns TRUE if the string is the start of a formula, FALSE otherwise.
-       Also returns the column and row of the formula.
-     */
 {
     int len, maxlen = rowwidth(MAXROWS);
     char *start, numstring[10];
@@ -104,18 +102,15 @@ int formulastart(char **input, int *col, int *row)
     if (!isalpha(**input))
         return(FALSE);
     *col = *((*input)++) - 'A';
-    if (isalpha(**input))
-    {
+    if (isalpha(**input)) {
         *col *= 26;
         *col += *((*input)++) - 'A' + 26;
     }
     if (*col >= MAXCOLS)
         return(FALSE);
     start = *input;
-    for (len = 0; len < maxlen; len++)
-    {
-        if (!isdigit(*((*input)++)))
-        {
+    for (len = 0; len < maxlen; len++) {
+        if (!isdigit(*((*input)++))) {
             (*input)--;
             break;
         }
@@ -141,31 +136,25 @@ void errormsg(char *s)
     writef(1, 25, WHITE, 79, "");
 } /* errormsg */
 
+/* Modifies a formula when its column or row designations need to change. */
 void fixformula(int col, int row, int action, int place)
-    /* Modifies a formula when its column or row designations need to change. */
 {
-    char *colstart, *rowstart, s[6], newformula[MAXINPUT + 1],
-         *curpos = newformula;
+    char *colstart, *rowstart, s[6], newformula[MAXINPUT + 1], *curpos = newformula;
     int fcol, frow;
     CELLPTR cellptr = cell[col][row];
     double value;
 
     strcpy(newformula, cellptr->v.f.formula);
-    while (*curpos != 0)
-    {
-        if (formulastart(&curpos, &fcol, &frow))
-        {
+    while (*curpos != 0) {
+        if (formulastart(&curpos, &fcol, &frow)) {
             rowstart = curpos - rowwidth(frow);
             colstart = rowstart - ((fcol > 25) ? 2 : 1);
-            switch (action)
-            {
+            switch (action) {
                 case COLADD :
                     if (fcol < place)
                         break;
-                    if (fcol == 25)
-                    {
-                        if (strlen(newformula) == MAXINPUT)
-                        {
+                    if (fcol == 25) {
+                        if (strlen(newformula) == MAXINPUT) {
                             deletecell(col, row, NOUPDATE);
                             alloctext(col, row, newformula);
                             return;
@@ -178,10 +167,8 @@ void fixformula(int col, int row, int action, int place)
                 case ROWADD :
                     if (frow < place)
                         break;
-                    if (rowwidth(frow + 1) != rowwidth(frow))
-                    {
-                        if (strlen(newformula) == MAXINPUT)
-                        {
+                    if (rowwidth(frow + 1) != rowwidth(frow)) {
+                        if (strlen(newformula) == MAXINPUT) {
                             deletecell(col, row, NOUPDATE);
                             alloctext(col, row, newformula);
                             return;
@@ -212,8 +199,7 @@ void fixformula(int col, int row, int action, int place)
         else
             curpos++;
     }
-    if (strlen(newformula) != strlen(cellptr->v.f.formula))
-    {
+    if (strlen(newformula) != strlen(cellptr->v.f.formula)) {
         value = cellptr->v.f.fvalue;
         deletecell(col, row, NOUPDATE);
         allocformula(col, row, newformula, value);
@@ -222,21 +208,20 @@ void fixformula(int col, int row, int action, int place)
         strcpy(cellptr->v.f.formula, newformula);
 } /* fixformula */
 
+/* Changes a column number to a string */
 void colstring(int col, char *colstr)
-    /* Changes a column number to a string */
 {
     setmem(colstr, 3, 0);
     if (col < 26)
         colstr[0] = col + 'A';
-    else
-    {
+    else {
         colstr[0] = (col / 26) - 1 + 'A';
         colstr[1] = (col % 26) + 'A';
     }
 } /* colstring */
 
+/* Changes a column to a centered string */
 void centercolstring(int col, char *colstr)
-    /* Changes a column to a centered string */
 {
     char s[3];
     int spaces1, spaces2;
@@ -247,13 +232,12 @@ void centercolstring(int col, char *colstr)
     sprintf(colstr, "%*s%s%*s", spaces1, "", s, spaces2, "");
 } /* centercolstring */
 
+/* Sets the value of leftcol based on the value of rightcol */
 void setleftcol(void)
-    /* Sets the value of leftcol based on the value of rightcol */
 {
     int total = 80, col = 0;
 
-    while ((total >= LEFTMARGIN) && (rightcol - col >= 0))
-    {
+    while ((total >= LEFTMARGIN) && (rightcol - col >= 0)) {
         colstart[SCREENCOLS - col - 1] = total - colwidth[rightcol - col];
         total -= colwidth[rightcol - col++];
     }
@@ -262,8 +246,7 @@ void setleftcol(void)
     movmem(&colstart[SCREENCOLS - col + 1], colstart, col - 1);
     leftcol = rightcol - col + 2;
     total = colstart[0] - LEFTMARGIN;
-    if (total != 0)
-    {
+    if (total != 0) {
         for (col = leftcol; col <= rightcol; col++)
             colstart[col - leftcol] -= total;
     }
@@ -284,8 +267,8 @@ void setrightcol(void)
     printcol();
 } /* setrightcol */
 
+/* Figures out the value of toprow based on the value of bottomrow */
 void settoprow(void)
-    /* Figures out the value of toprow based on the value of bottomrow */
 {
     if (bottomrow - SCREENROWS < -1)
         bottomrow = 19;
@@ -293,8 +276,8 @@ void settoprow(void)
     printrow();
 } /* settoprow */
 
+/* Figures out the value of bottomrow based on the value of toprow */
 void setbottomrow(void)
-    /* Figures out the value of bottomrow based on the value of toprow */
 {
     if (toprow + SCREENROWS > MAXROWS)
         toprow = MAXROWS - 20;
@@ -302,17 +285,14 @@ void setbottomrow(void)
     printrow();
 } /* setbottomrow */
 
+/* Sets the value of lastcol based on the current value */
 void setlastcol(void)
-    /* Sets the value of lastcol based on the current value */
 {
     register int row, col;
 
-    for (col = lastcol; col >= 0; col--)
-    {
-        for (row = 0; row <= lastrow; row++)
-        {
-            if (cell[col][row] != NULL)
-            {
+    for (col = lastcol; col >= 0; col--) {
+        for (row = 0; row <= lastrow; row++) {
+            if (cell[col][row] != NULL) {
                 lastcol = col;
                 return;
             }
@@ -321,17 +301,14 @@ void setlastcol(void)
     lastcol = 0;
 } /* setlastcol */
 
+/* Sets the value of lastrow based on the current value */
 void setlastrow(void)
-    /* Sets the value of lastrow based on the current value */
 {
     register int row, col;
 
-    for (row = lastrow; row >= 0; row--)
-    {
-        for (col = 0; col <= lastcol; col++)
-        {
-            if (cell[col][row] != NULL)
-            {
+    for (row = lastrow; row >= 0; row--) {
+        for (col = 0; col <= lastcol; col++) {
+            if (cell[col][row] != NULL) {
                 lastrow = row;
                 return;
             }
@@ -340,16 +317,15 @@ void setlastrow(void)
     lastrow = 0;
 } /* setlastrow */
 
+/* Acts on a particular input */
 void act(char *s)
-    /* Acts on a particular input */
 {
     int attrib, allocated;
     double value;
 
     deletecell(curcol, currow, UPDATE);
     value = parse(s, &attrib);
-    switch(attrib)
-    {
+    switch(attrib) {
         case TEXT :
             allocated = alloctext(curcol, currow, s);
             if (allocated)
@@ -362,8 +338,7 @@ void act(char *s)
             allocated = allocformula(curcol, currow, s, value);
             break;
     } /* switch */
-    if (allocated)
-    {
+    if (allocated) {
         format[curcol][currow] &= ~OVERWRITE;
         clearoflags(curcol + 1, currow, UPDATE);
         if (attrib == TEXT)
@@ -380,16 +355,14 @@ void act(char *s)
     printfreemem();
 } /* act */
 
+/* Sets the overwrite flag on cells starting at (col + 1, row) - returns
+    the number of the column after the last column set. */
 int setoflags(int col, int row, int display)
-    /* Sets the overwrite flag on cells starting at (col + 1, row) - returns
-       the number of the column after the last column set.
-     */
 {
     int len;
 
     len = strlen(cell[col][row]->v.text) - colwidth[col];
-    while ((++col < MAXCOLS) && (len > 0) && (cell[col][row] == NULL))
-    {
+    while ((++col < MAXCOLS) && (len > 0) && (cell[col][row] == NULL)) {
         format[col][row] |= OVERWRITE;
         len -= colwidth[col];
         if (display && (col >= leftcol) && (col <= rightcol))
@@ -398,12 +371,10 @@ int setoflags(int col, int row, int display)
     return(col);
 } /* setoflags */
 
+/* Clears the overwrite flag on cells starting at (col, row) */
 void clearoflags(int col, int row, int display)
-    /* Clears the overwrite flag on cells starting at (col, row) */
 {
-    while ((format[col][row] >= OVERWRITE) && (col < MAXCOLS) &&
-            (cell[col][row] == NULL))
-    {
+    while ((format[col][row] >= OVERWRITE) && (col < MAXCOLS) && (cell[col][row] == NULL)) {
         format[col][row] &= ~OVERWRITE;
         if (display && (col >= leftcol) && (col <= rightcol))
             displaycell(col, row, NOHIGHLIGHT, NOUPDATE);
@@ -426,9 +397,8 @@ void updateoflags(int col, int row, int display)
     }
 } /* updateoflags */
 
-void textstring(char *instring, char *outstring, int col, int fvalue,
-        int formatting)
-    /* Sets the string representation of text */
+/* Sets the string representation of text */
+void textstring(char *instring, char *outstring, int col, int fvalue, int formatting)
 {
     char *just, *ljust = "%-*s", *rjust = "%*s";
 
@@ -441,58 +411,46 @@ void textstring(char *instring, char *outstring, int col, int fvalue,
         outstring[colwidth[col]] = 0;
 } /* textstring */
 
-void valuestring(CELLPTR cellptr, double value, char *vstring, int col,
-        int fvalue, int *color, int formatting)
-    /* Sets the string representation of a value */
+/* Sets the string representation of a value */
+void valuestring(CELLPTR cellptr, double value, char *vstring, int col, int fvalue, int *color, int formatting)
 {
     char s[81];
     char *fstring;
     int width, pos;
 
-    if (value == HUGE_VAL)
-    {
+    if (value == HUGE_VAL) {
         strcpy(vstring, MSGERROR);
         *color = ERRORCOLOR;
     }
-    else
-    {
-        if (formatting)
-        {
+    else {
+        if (formatting) {
             sprintf(vstring, "%1.*f", fvalue & 15, cellptr->v.value);
-            if (fvalue & COMMAS)
-            {
+            if (fvalue & COMMAS) {
                 pos = strcspn(vstring, ".");
-                while (pos > 3)
-                {
+                while (pos > 3) {
                     pos -= 3;
-                    if (vstring[pos - 1] != '-')
-                    {
+                    if (vstring[pos - 1] != '-') {
                         movmem(&vstring[pos], &vstring[pos + 1], strlen(vstring) - pos + 1);
                         vstring[pos] = ',';
                     }
                 }
             }
-            if (fvalue & DOLLAR)
-            {
-                if (vstring[0] == '-')
-                {
+            if (fvalue & DOLLAR) {
+                if (vstring[0] == '-') {
                     fstring = " $";
                     width = colwidth[col] - 2;
                 }
-                else
-                {
+                else {
                     fstring = " $ ";
                     width = colwidth[col] - 3;
                 }
             }
-            else
-            {
+            else {
                 fstring = "";
                 width = colwidth[col];
             }
             strcpy(s, vstring);
-            if (fvalue & RJUSTIFY)
-            {
+            if (fvalue & RJUSTIFY) {
                 if ((signed int)strlen(vstring) > width)
                     vstring[width] = 0;
                 else
@@ -537,18 +495,15 @@ char *cellstring(int col, int row, int *color, int formatting)
             *color = TEXTCOLOR;
         }
     }
-    else
-    {
+    else {
         formatvalue = format[col][row];
-        switch (cellptr->attrib)
-        {
+        switch (cellptr->attrib) {
             case TEXT :
                 textstring(cellptr->v.text, s, col, formatvalue, formatting);
                 *color = TEXTCOLOR;
                 break;
             case FORMULA :
-                if (formdisplay)
-                {
+                if (formdisplay) {
                     textstring(cellptr->v.f.formula, s, col, formatvalue, formatting);
                     *color = FORMULACOLOR;
                     break;
@@ -607,8 +562,7 @@ int getcommand(char *msgstr, char *comstr)
     int ch, counter, len = strlen(msgstr);
 
     tscroll(UP, 0, 1, 24, 80, 24, WHITE);
-    for (counter = 0; counter < len; counter++)
-    {
+    for (counter = 0; counter < len; counter++) {
         if (isupper(msgstr[counter]))
             writef(counter + 1, 24, COMMANDCOLOR, 1, "%c", msgstr[counter]);
         else
