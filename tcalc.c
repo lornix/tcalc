@@ -25,6 +25,7 @@ void run()
 {
     int input;
 
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     do
     {
         displaycell(curcol, currow, HIGHLIGHT, NOUPDATE);
@@ -138,16 +139,15 @@ void run()
 
 int main(int argc, char *argv[])
 {
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     window(1, 1, 80, 25);
     initcursor();
     initcolortable();
     setcursor(nocursor);
     setcolor(WHITE);
     clrscr();
-    writef((80 - strlen(MSGHEADER)) >> 1, 11, MSGHEADERCOLOR, strlen(MSGHEADER),
-            MSGHEADER);
-    writef((80 - strlen(MSGKEYPRESS)) >> 1, 13, PROMPTCOLOR,
-            strlen(MSGKEYPRESS), MSGKEYPRESS);
+    writef((80-strlen(MSGHEADER))>>1,11,MSGHEADERCOLOR,strlen(MSGHEADER),MSGHEADER);
+    writef((80-strlen(MSGKEYPRESS))>>1,13,PROMPTCOLOR,strlen(MSGKEYPRESS),MSGKEYPRESS);
     gotoxy(80, 25);
     getkey();
     setcolor(WHITE);

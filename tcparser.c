@@ -37,6 +37,7 @@ char *input, isformula;
 
 int matherr(struct exception *e)
 {
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     e->retval = HUGE_VAL;
     return(1);
 } /* matherr */
@@ -46,6 +47,7 @@ int isfunc(char *s)
 {
     int len = strlen(s);
 
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (strncmp(s, input, len) == 0)
     {
         strncpy(curtoken.x.funcname, input, len);
@@ -62,6 +64,7 @@ int nexttoken(void)
     char *start, numstring[80];
     int decimal, len, numlen;
 
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     while (*input == ' ')
         input++;
     if (*input == 0)
@@ -151,6 +154,7 @@ int nexttoken(void)
 void push(struct TOKENREC *token)
     /* Pushes a new token onto the stack */
 {
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (stacktop == PARSERSTACKSIZE - 1)
     {
         errormsg(MSGSTACKERROR);
@@ -163,6 +167,7 @@ void push(struct TOKENREC *token)
 struct TOKENREC pop(void)
     /* Pops the top token off of the stack */
 {
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     return(stack[stacktop--]);
 } /* pop */
 
@@ -171,6 +176,7 @@ int gotostate(int production)
 {
     int state = stack[stacktop].state;
 
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (production <= 3)
     {
         switch(state)
@@ -255,6 +261,7 @@ int gotostate(int production)
 double cellvalue(int col, int row)
     /* Finds the value of a particular cell */
 {
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (cell[col][row] == NULL)
         return(0);
     if (cell[col][row]->attrib == TEXT)
@@ -267,6 +274,7 @@ double cellvalue(int col, int row)
 void shift(int state)
     /* Shifts a token onto the stack */
 {
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     curtoken.state = state;
     push(&curtoken);
     tokentype = nexttoken();
@@ -278,6 +286,7 @@ void reduce(int reduction)
     struct TOKENREC token1, token2;
     int counter;
 
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     switch (reduction)
     {
         case 1 :
@@ -419,6 +428,7 @@ double parse(char *s, int *att)
     char accepted = FALSE;
     char copy[80];
 
+    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     error = FALSE;
     isformula = FALSE;
     input = copy;
