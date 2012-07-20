@@ -15,14 +15,21 @@ LDFLAGS+=-lncurses
 #
 .PHONY: all clean
 
-all: tcalc
+all: tcalc tags core
 
 tcalc: tcdisply.o tcinput.o tcommand.o tcparser.o tcutil.o tcalc.o compat.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
-	-rm core 2>/dev/null
+
+tags:
+	@ctags .
+
+core:
+	@touch core
+	@-rm core
 
 %.o : %.c tcalc.h compat.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c $<
 
 clean:
-	-rm -f *.o tcalc core
+	@touch tags core tcalc
+	@-rm -f *.o tcalc core tags

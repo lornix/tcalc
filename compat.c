@@ -135,8 +135,8 @@ void gettextinfo(struct text_info* r)
 }
 void gotoxy(int x, int y)
 {
-    master_text_info.curx=x;
-    master_text_info.cury=y;
+    master_text_info.curx=x-1;
+    master_text_info.cury=y-1;
 }
 void movmem(void* src, void* dest, unsigned length)
 {

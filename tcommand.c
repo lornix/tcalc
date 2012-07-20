@@ -173,8 +173,10 @@ struct CELLREC rec;
 /* Loads a new spreadsheet */
 void loadsheet(char *filename)
 {
-    int size, allocated, reallastcol = 0, reallastrow = 0, file;
-    char check[81];
+    int allocated;
+    FILE* file;
+    const int MAXBUFLEN=255;
+    char buf[MAXBUFLEN+1];
 
     if (filename[0] == 0) {
         writeprompt(MSGFILENAME);
@@ -185,59 +187,71 @@ void loadsheet(char *filename)
         errormsg(MSGNOEXIST);
         return;
     }
-    if ((file = open(filename, O_RDWR | O_BINARY)) == -1) {
+    if ((file = fopen(filename,"rb"))==0) {
         errormsg(MSGNOOPEN);
         return;
     }
-    read(file, check, strlen(name) + 1);
-    if (strcmp(check, name) != 0) {
+    fgets(buf,MAXBUFLEN,file);
+    if (strncmp(buf, name,strlen(name)) != 0) {
         errormsg(MSGNOTURBOCALC);
-        close(file);
+        fclose(file);
         return;
     }
     writef(1, 25, PROMPTCOLOR, 79, MSGLOADING);
     gotoxy(strlen(MSGLOADING) + 1, 25);
     clearsheet();
-    read(file, (char *)&size, 1);
-    read(file, (char *)&lastcol, 2);
-    read(file, (char *)&lastrow, 2);
-    read(file, (char *)&size, 2);
-    read(file, colwidth, sizeof(colwidth));
-    do {
-        if (read(file, (char *)&curcol, 2) <= 0)
+
+    /* read the max dimensions */
+    fgets(buf,MAXBUFLEN,file);
+    sscanf(buf,"%d %d\n",&lastcol,&lastrow);
+
+    while (1) {
+        int col,width;
+        fgets(buf,MAXBUFLEN,file);
+        if (strcmp(buf,"---\n")==0)
             break;
-        read(file, (char *)&currow, 2);
-        read(file, &format[curcol][currow], 1);
-        read(file, (char *)&size, 2);
-        read(file, (char *)&rec, size);
-        switch (rec.attrib) {
-            case TEXT :
-                if ((allocated = alloctext(curcol, currow, rec.v.text)) == TRUE)
-                    setoflags(curcol, currow, NOUPDATE);
+        sscanf(buf,"%d width %d",&col,&width);
+        colwidth[col]=width;
+    }
+    while (1) {
+        int col,row;
+        char fmt,what;
+        char f1[MAXBUFLEN+1];
+        char f2[MAXBUFLEN+1];
+        struct CELLREC rec;
+        setmem(&rec,sizeof(struct CELLREC),0);
+        if (fgets(buf,MAXBUFLEN,file)==NULL)
+            break;
+        sscanf(buf,"%d %d %c %c %s %s\n",&col,&row,&fmt,&what,f1,f2);
+        format[col][row]=fmt;
+        switch (what) {
+            case 'F':
+                rec.attrib=FORMULA;
+                rec.v.f.fvalue=strtod(f1,NULL);
+                strncpy(rec.v.f.formula,f2+1,strlen(f2)-2);
+                allocated = allocformula(col, row, rec.v.f.formula, rec.v.f.fvalue);
                 break;
-            case VALUE :
-                allocated = allocvalue(curcol, currow, rec.v.value);
+            case 'T':
+                rec.attrib=TEXT;
+                strncpy(rec.v.text,f1+1,strlen(f1)-2);
+                if ((allocated = alloctext(col, row, rec.v.text)) == TRUE)
+                        setoflags(curcol, currow, NOUPDATE);
                 break;
-            case FORMULA :
-                allocated = allocformula(curcol, currow, rec.v.f.formula, rec.v.f.fvalue);
+            case 'V':
+                rec.attrib=VALUE;
+                rec.v.value=strtod(f1,NULL);
+                allocated = allocvalue(col, row, rec.v.value);
                 break;
-        } /* switch */
+            default:
+                ;
+                /* no idea what we got... drop it */
+        }
         if (!allocated) {
             errormsg(MSGFILELOMEM);
-            lastrow = reallastrow;
-            lastcol = reallastcol;
-            format[curcol][currow] = DEFAULTFORMAT;
             break;
         }
-        else {
-            if (curcol > reallastcol)
-                reallastcol = curcol;
-            if (currow > reallastrow)
-                reallastrow = currow;
-        }
     }
-    while (TRUE);
-    close(file);
+    fclose(file);
     writef(1, 25, WHITE, strlen(MSGLOADING), "");
     gotoxy(1, 25);
     printfreemem();
@@ -250,8 +264,9 @@ void loadsheet(char *filename)
 /* Saves the current spreadsheet */
 void savesheet(void)
 {
-    char filename[MAXINPUT+1], eof = 26;
-    int size, col, row, overwrite, file;
+    char filename[MAXINPUT+1];
+    FILE* file;
+    int col, row, overwrite;
     CELLPTR cellptr;
 
     filename[0] = 0;
@@ -262,43 +277,41 @@ void savesheet(void)
         if (!getyesno(&overwrite, MSGOVERWRITE) || (overwrite == 'N'))
             return;
     }
-    if ((file = open(filename, O_RDWR | O_CREAT | O_TRUNC | O_BINARY, S_IREAD | S_IWRITE)) == -1) {
+    if ((file = fopen(filename,"wb"))==0) {
         errormsg(MSGNOOPEN);
         return;
     }
     writef(1, 25, PROMPTCOLOR, 79, MSGSAVING);
     gotoxy(strlen(MSGSAVING) + 1, 25);
-    write(file, name, strlen(name) + 1);
-    write(file, &eof, 1);
-    write(file, (char *)&lastcol, 2);
-    write(file, (char *)&lastrow, 2);
-    size = MAXCOLS;
-    write(file, (char *)&size, 2);
-    write(file, colwidth, sizeof(colwidth));
+
+    fprintf(file,"%s\n",name);
+
+    fprintf(file,"%d %d\n",lastcol,lastrow);
+
+    for (col = 0; col<=lastcol; col++) {
+        fprintf(file,"%d width %d\n",col,colwidth[col]);
+    }
+    fprintf(file,"%s\n","---");
+
     for (row = 0; row <= lastrow; row++) {
         for (col = lastcol; col >= 0; col--) {
             if (cell[col][row] != NULL) {
-                write(file, (char *)&col, 2);
-                write(file, (char *)&row, 2);
-                write(file, (char *)&format[col][row], 1);
                 cellptr = cell[col][row];
                 switch(cellptr->attrib) {
                     case TEXT :
-                        size = strlen(cellptr->v.text) + 2;
+                        fprintf(file,"%d %d %c T '%s'\n",col,row,format[col][row],cellptr->v.text);
                         break;
                     case VALUE :
-                        size = sizeof(double) + 1;
+                        fprintf(file,"%d %d %c V %.6f\n",col,row,format[col][row],cellptr->v.value);
                         break;
                     case FORMULA :
-                        size = strlen(cellptr->v.f.formula) + 2 + sizeof(double);
+                        fprintf(file,"%d %d %c F %.6f '%s'\n",col,row,format[col][row],cellptr->v.f.fvalue,cellptr->v.f.formula);
                         break;
                 } /* switch */
-                write(file, (char *)&size, 2);
-                write(file, (char *)cellptr, size);
             }
         }
     }
-    close(file);
+    fclose(file);
     writef(1, 25, WHITE, strlen(MSGSAVING), "");
     gotoxy(1, 25);
     changed = FALSE;
