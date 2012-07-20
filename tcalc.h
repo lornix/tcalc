@@ -112,17 +112,17 @@
 
 struct CELLREC
 {
- char attrib;
- union
- {
-  char text[MAXINPUT + 1];
-  double value;
-  struct
-  {
-   double fvalue;
-   char formula[MAXINPUT + 1];
-  } f;
- } v;
+    char attrib;
+    union
+    {
+        char text[MAXINPUT + 1];
+        double value;
+        struct
+        {
+            double fvalue;
+            char formula[MAXINPUT + 1];
+        } f;
+    } v;
 };
 
 typedef struct CELLREC *CELLPTR;
