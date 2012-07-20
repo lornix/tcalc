@@ -5,7 +5,6 @@
 
 #define HUGE_VAL __DBL_MAX__
 #define O_BINARY        0x8000
-#define BLINK           128     /* blink bit */
 enum text_modes { LASTMODE=-1, BW40=0, C40, BW80, C80, MONO=7, C4350=64 };
 enum COLORS {
     BLACK,   /* dark colors */

@@ -130,8 +130,8 @@ int formulastart(char **input, int *col, int *row)
     return(TRUE);
 } /* formulastart */
 
+/* Prints an error message at the bottom of the screen */
 void errormsg(char *s)
-    /* Prints an error message at the bottom of the screen */
 {
     printf("%c", 7);      /* Beeps the speaker */
     writef(1, 25, ERRORCOLOR, 79, "%s  %s", s, MSGKEYPRESS);
@@ -414,7 +414,9 @@ void clearoflags(int col, int row, int display)
 /* Starting in col, moves back to the last TEXT cell and updates all flags */
 void updateoflags(int col, int row, int display)
 {
-    while ((cell[col][row] == NULL) && (col-- > 0));
+    while ((cell[col][row] == NULL) && (col>0)) {
+        col--;
+    }
     if (cell[col][row] != NULL) {
         if (cell[col][row]->attrib == TEXT) {
             if (col >= 0) {
@@ -564,14 +566,14 @@ char *cellstring(int col, int row, int *color, int formatting)
     return(s);
 } /* cellstring */
 
+/* Prints a prompt on the screen */
 void writeprompt(char *prompt)
-    /* Prints a prompt on the screen */
 {
     writef(1, 24, PROMPTCOLOR, 80, prompt);
 } /* writeprompt */
 
+/* Swaps the first and second values */
 void swap(int *val1, int *val2)
-    /* Swaps the first and second values */
 {
     int temp;
 
@@ -580,10 +582,9 @@ void swap(int *val1, int *val2)
     *val2 = temp;
 } /* swap */
 
+/* If the spreadsheet has been changed, will ask the user if they want to
+    save it. */
 void checkforsave(void)
-    /* If the spreadsheet has been changed, will ask the user if they want to
-       save it.
-     */
 {
     int save;
 

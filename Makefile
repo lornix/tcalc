@@ -19,6 +19,7 @@ all: tcalc
 
 tcalc: tcdisply.o tcinput.o tcommand.o tcparser.o tcutil.o tcalc.o compat.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+	-rm core 2>/dev/null
 
 %.o : %.c tcalc.h compat.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c $<

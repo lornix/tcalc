@@ -180,8 +180,8 @@ void clearsheet(void)
 
 struct CELLREC rec;
 
+/* Loads a new spreadsheet */
 void loadsheet(char *filename)
-    /* Loads a new spreadsheet */
 {
     int size, allocated, reallastcol = 0, reallastrow = 0, file;
     char check[81];
@@ -255,10 +255,10 @@ void loadsheet(char *filename)
         }
     }
     while (TRUE);
+    close(file);
     writef(1, 25, WHITE, strlen(MSGLOADING), "");
     gotoxy(1, 25);
     printfreemem();
-    close(file);
     curcol = currow = 0;
     setrightcol();
     displayscreen(NOUPDATE);
@@ -302,6 +302,9 @@ void savesheet(void)
         {
             if (cell[col][row] != NULL)
             {
+                write(file, (char *)&col, 2);
+                write(file, (char *)&row, 2);
+                write(file, (char *)&format[col][row], 1);
                 cellptr = cell[col][row];
                 switch(cellptr->attrib)
                 {
@@ -315,9 +318,6 @@ void savesheet(void)
                         size = strlen(cellptr->v.f.formula) + 2 + sizeof(double);
                         break;
                 } /* switch */
-                write(file, (char *)&col, 2);
-                write(file, (char *)&row, 2);
-                write(file, (char *)&format[col][row], 1);
                 write(file, (char *)&size, 2);
                 write(file, (char *)cellptr, size);
             }
