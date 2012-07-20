@@ -1,7 +1,5 @@
 /* Turbo C++ - (C) Copyright 1987,1988,1990 by Borland International */
 
-#include "compat.h"
-
 #define S_IREAD	 0x0100	/* from SYS\STAT.H */
 #define S_IWRITE 0x0080	/* from SYS\STAT.H */
 
@@ -129,21 +127,10 @@ struct CELLREC
 
 typedef struct CELLREC *CELLPTR;
 
-#if defined(__TINY__) || defined(__SMALL__) || defined(__MEDIUM__)
-
-#define memsize coreleft() - 1000
-#define textcellsize(s) (((strlen(s) >> 1) + 3) << 1)
-#define valuecellsize 12
-#define formulacellsize(s) (((strlen(s) >> 1) + 7) << 1)
-
-#else
-
 #define memsize farcoreleft() - 1000
 #define textcellsize(s) (((strlen(s) >> 1) + 5) << 1)
 #define valuecellsize 16
 #define formulacellsize(s) (((strlen(s) >> 1) + 9) << 1)
-
-#endif
 
 #define BS 8
 #define FORMFEED 12
@@ -178,8 +165,7 @@ int editstring(char *s, char *legal, int maxlength);
 int getint(int *number, int low, int high);
 void getinput(int c);
 void setcolor(int color);
-void scroll(int direction, int lines, int x1, int y1, int x2, int y2,
-            int attrib);
+void scroll(int direction, int lines, int x1, int y1, int x2, int y2, int attrib);
 void setcursor(unsigned int shape);
 void writef(int col, int row, int color, int width, char *format, ...);
 void printcol(void);
@@ -248,11 +234,21 @@ extern unsigned char colstart[SCREENCOLS];
 extern char formdisplay;
 extern char changed;
 extern char autocalc;
-extern int leftcol, rightcol, toprow, bottomrow, curcol, currow, lastcol,
- lastrow, direction;
+extern int leftcol, rightcol, toprow, bottomrow, curcol, currow, lastcol, lastrow, direction;
 extern long memleft;
 extern char stop;
 extern char matherror;
 extern unsigned int oldcursor, shortcursor, tallcursor, nocursor;
 
 #endif
+
+#include "compat.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <math.h>
+#include <stdarg.h>
+#include <string.h>

@@ -1,8 +1,5 @@
 /* Turbo C++ - (C) Copyright 1987,1988,1990 by Borland International */
 
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
 #include "tcalc.h"
 
 static unsigned char colortable[256];
@@ -81,7 +78,7 @@ unsigned int getcursor(void)
  return(reg.x.cx);
 } /* getcursor */
 
-void changecursor(insmode)
+void changecursor(int insmode)
 /* Changes the cursor shape based on the current insert mode */
 {
  if (insmode)
@@ -279,4 +276,3 @@ void initcolortable(void)
       colortable[fg] = colortable[fg - 128] | 0x80;
   }
 } /* initcolortable */
-

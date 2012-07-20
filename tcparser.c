@@ -1,10 +1,5 @@
 /* Turbo C++ - (C) Copyright 1987,1988,1990 by Borland International */
 
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include <ctype.h>
-#include <errno.h>
 #include "tcalc.h"
 
 #define PLUS 0

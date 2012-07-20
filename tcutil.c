@@ -1,10 +1,5 @@
 /* Turbo C++ - (C) Copyright 1987,1988,1990 by Borland International */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <ctype.h>
-#include <string.h>
 #include "tcalc.h"
 
 int alloctext(int col, int row, char *s)

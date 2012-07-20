@@ -2,8 +2,6 @@
 
 #define MAIN
 
-#include <string.h>
-#include <stdarg.h>
 #include "tcalc.h"
 
 CELLPTR cell[MAXCOLS][MAXROWS], curcell;
