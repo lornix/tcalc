@@ -47,6 +47,7 @@ struct text_info {
 char  *strupr(char *s);
 double pow10(double x);
 int    bioskey(int cmd);
+void   refreshscreen();
 int    cputs(const char *str);
 int    int86(int intno, union REGS *inregs, union REGS *outregs);
 int    movetext(int left, int top, int right, int bottom, int destleft, int desttop);

@@ -83,7 +83,7 @@ void deletecell(int col, int row, int display)
 /* Prints the amount of free memory */
 void printfreemem(void)
 {
-    writef(strlen(MSGMEMORY) + 2, 1, MEMORYCOLOR, 6, "%6ld", memleft);
+    writef(strlen(MSGMEMORY) + 2, 1, MEMORYCOLOR, 8, "%8ld", memleft);
 } /* printfreemem */
 
 /* Returns the width in spaces of row */

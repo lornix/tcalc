@@ -8,15 +8,16 @@ int getkey(void)
     int key, lo, hi;
 
     key = bioskey(0);
+    if (key==12)
+        refreshscreen();
     lo = key & 0X00FF;
     hi = (key & 0XFF00) >> 8;
     return((lo == 0) ? hi + 256 : lo);
 } /* getkey */
 
+/* Allows the user to edit a string with only certain characters allowed -
+    Returns TRUE if ESC was not pressed, FALSE is ESC was pressed. */
 int editstring(char *s, char *legal, int maxlength)
-    /* Allows the user to edit a string with only certain characters allowed -
-       Returns TRUE if ESC was not pressed, FALSE is ESC was pressed.
-     */
 {
     int c, len = strlen(s), pos = len, insert = TRUE;
 
@@ -59,13 +60,10 @@ int editstring(char *s, char *legal, int maxlength)
             case CR :
                 break;
             case UPKEY :
-                c = CR;
                 break;
             case DOWNKEY :
-                c = CR;
                 break;
             case ESC :
-                len = 0;
                 break;
             default :
                 if (((legal[0] == 0) || (strchr(legal, c) != NULL)) &&
@@ -83,28 +81,27 @@ int editstring(char *s, char *legal, int maxlength)
         } /* switch */
         s[len] = 0;
     }
-    while ((c != CR) && (c != ESC));
+    while ((c!=UPKEY)&&(c!=DOWNKEY)&&(c!=CR)&&(c!=ESC));
     clearinput();
     changecursor(FALSE);
     setcursor(nocursor);
     return(c != ESC);
 } /* editstring */
 
+/* Reads and acts on an input string from the keyboard that started with c. */
 void getinput(int c)
-    /* Reads and acts on an input string from the keyboard that started with c. */
 {
-    char s[MAXINPUT + 1];
-
-    s[0] = c;
-    s[1] = 0;
-    if (!editstring(s, "", MAXINPUT) || (s[0] == 0))
+    char s[MAXINPUT+1];
+    s[0]=c;
+    s[1]=0;
+    if (!editstring(s,"",MAXINPUT)||(s[0]==0))
         return;
     act(s);
-    changed = TRUE;
+    changed=TRUE;
 } /* getinput */
 
+/* Reads in a positive integer from low to high */
 int getint(int *number, int low, int high)
-    /* Reads in a positive integer from low to high */
 {
     int i, good = FALSE;
     char s[5], message[81];
@@ -123,8 +120,8 @@ int getint(int *number, int low, int high)
     return(TRUE);
 } /* getint */
 
+/* Reads in a cell name that was typed in - Returns FALSE if ESC was pressed */
 int getcell(int *col, int *row)
-    /* Reads in a cell name that was typed in - Returns FALSE if ESC was pressed */
 {
     int first = TRUE, good = FALSE, len, numlen = rowwidth(MAXROWS),
         oldcol = *col, oldrow = *row;
@@ -167,10 +164,9 @@ int getcell(int *col, int *row)
     while (!good);
     return(TRUE);
 } /* getcell */
+/* Prints a prompt and gets a yes or no answer - returns FALSE if ESC was
+    pressed, TRUE if not. */
 int getyesno(int *yesno, char *prompt)
-    /* Prints a prompt and gets a yes or no answer - returns TRUE if ESC was
-       pressed, FALSE if not.
-     */
 {
     writeprompt(prompt);
     setcursor(shortcursor);
@@ -185,4 +181,3 @@ int getyesno(int *yesno, char *prompt)
     setcursor(nocursor);
     return(TRUE);
 } /* getyesno */
-

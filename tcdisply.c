@@ -201,7 +201,7 @@ void redrawscreen(void)
     setrightcol();
     setbottomrow();
     writef(1, 1, MSGMEMORYCOLOR, strlen(MSGMEMORY), MSGMEMORY);
-    writef(29, 1, PROMPTCOLOR, strlen(MSGCOMMAND), MSGCOMMAND);
+    writef(32, 1, PROMPTCOLOR, strlen(MSGCOMMAND), MSGCOMMAND);
     changeautocalc(autocalc);
     changeformdisplay(formdisplay);
     printfreemem();

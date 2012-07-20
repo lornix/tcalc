@@ -134,12 +134,12 @@ int main(int argc, char *argv[])
     initcursor();
     initcolortable();
     setcursor(nocursor);
-    setcolor(WHITE);
-    clrscr();
-    writef((80-strlen(MSGHEADER))>>1,11,MSGHEADERCOLOR,strlen(MSGHEADER),MSGHEADER);
-    writef((80-strlen(MSGKEYPRESS))>>1,13,PROMPTCOLOR,strlen(MSGKEYPRESS),MSGKEYPRESS);
-    gotoxy(80, 25);
-    getkey();
+    /* setcolor(WHITE); */
+    /* clrscr(); */
+    /* writef((80-strlen(MSGHEADER))>>1,11,MSGHEADERCOLOR,strlen(MSGHEADER),MSGHEADER); */
+    /* writef((80-strlen(MSGKEYPRESS))>>1,13,PROMPTCOLOR,strlen(MSGKEYPRESS),MSGKEYPRESS); */
+    /* gotoxy(80, 25); */
+    /* getkey(); */
     setcolor(WHITE);
     clrscr();
     initvars();

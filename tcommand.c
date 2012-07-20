@@ -121,7 +121,7 @@ void changeformdisplay(int newmode)
         strcpy(s, MSGFORMDISPLAY);
     else
         s[0] = 0;
-    writef(65, 1, MSGFORMDISPLAYCOLOR, strlen(MSGFORMDISPLAY), s);
+    writef(67, 1, MSGFORMDISPLAYCOLOR, strlen(MSGFORMDISPLAY), s);
 } /* autocalc */
 
 /* Edits a selected cell */
@@ -173,7 +173,7 @@ struct CELLREC rec;
 /* Loads a new spreadsheet */
 void loadsheet(char *filename)
 {
-    int allocated;
+    int allocated,col;
     FILE* file;
     const int MAXBUFLEN=255;
     char buf[MAXBUFLEN+1];
@@ -203,47 +203,54 @@ void loadsheet(char *filename)
 
     /* read the max dimensions */
     fgets(buf,MAXBUFLEN,file);
-    sscanf(buf,"%d %d\n",&lastcol,&lastrow);
+    sscanf(buf,"%d %d",&lastcol,&lastrow);
+    lastcol--;
+    lastrow--;
 
-    while (1) {
-        int col,width;
+    for (col=0; col<=lastcol; col++) {
+        int dmy,width;
         fgets(buf,MAXBUFLEN,file);
-        if (strcmp(buf,"---\n")==0)
-            break;
-        sscanf(buf,"%d width %d",&col,&width);
+        sscanf(buf,"%d width %d",&dmy,&width);
         colwidth[col]=width;
     }
     while (1) {
         int col,row;
         char fmt,what;
-        char f1[MAXBUFLEN+1];
-        char f2[MAXBUFLEN+1];
         struct CELLREC rec;
         setmem(&rec,sizeof(struct CELLREC),0);
         if (fgets(buf,MAXBUFLEN,file)==NULL)
             break;
-        sscanf(buf,"%d %d %c %c %s %s\n",&col,&row,&fmt,&what,f1,f2);
+        /* this allows us to resync if garbage occurs */
+        if (strncmp(buf,"---",3)!=0)
+            continue;
+        /* throw the sync line away */
+        fgets(buf,MAXBUFLEN,file);
+        sscanf(buf,"%d %d %c %c",&col,&row,&fmt,&what);
         format[col][row]=fmt;
         switch (what) {
             case 'F':
                 rec.attrib=FORMULA;
-                rec.v.f.fvalue=strtod(f1,NULL);
-                strncpy(rec.v.f.formula,f2+1,strlen(f2)-2);
+                fgets(buf,MAXBUFLEN,file);
+                rec.v.f.fvalue=strtod(buf,NULL);
+                fgets(buf,MAXBUFLEN,file);
+                strncpy(rec.v.f.formula,buf,strlen(buf)-1);
                 allocated = allocformula(col, row, rec.v.f.formula, rec.v.f.fvalue);
                 break;
             case 'T':
                 rec.attrib=TEXT;
-                strncpy(rec.v.text,f1+1,strlen(f1)-2);
+                fgets(buf,MAXBUFLEN,file);
+                strncpy(rec.v.text,buf,strlen(buf)-1);
                 if ((allocated = alloctext(col, row, rec.v.text)) == TRUE)
                         setoflags(curcol, currow, NOUPDATE);
                 break;
             case 'V':
                 rec.attrib=VALUE;
-                rec.v.value=strtod(f1,NULL);
+                fgets(buf,MAXBUFLEN,file);
+                rec.v.value=strtod(buf,NULL);
                 allocated = allocvalue(col, row, rec.v.value);
                 break;
             default:
-                ;
+                allocated=1;
                 /* no idea what we got... drop it */
         }
         if (!allocated) {
@@ -286,26 +293,30 @@ void savesheet(void)
 
     fprintf(file,"%s\n",name);
 
-    fprintf(file,"%d %d\n",lastcol,lastrow);
+    fprintf(file,"%d %d\n",lastcol+1,lastrow+1);
 
     for (col = 0; col<=lastcol; col++) {
-        fprintf(file,"%d width %d\n",col,colwidth[col]);
+        fprintf(file,"%d width %d\n",col+1,colwidth[col]);
     }
-    fprintf(file,"%s\n","---");
 
     for (row = 0; row <= lastrow; row++) {
         for (col = lastcol; col >= 0; col--) {
             if (cell[col][row] != NULL) {
                 cellptr = cell[col][row];
+                fprintf(file,"%s\n","---");
                 switch(cellptr->attrib) {
                     case TEXT :
-                        fprintf(file,"%d %d %c T '%s'\n",col,row,format[col][row],cellptr->v.text);
+                        fprintf(file,"%d %d %c T\n",col,row,format[col][row]);
+                        fprintf(file,"%s\n",cellptr->v.text);
                         break;
                     case VALUE :
-                        fprintf(file,"%d %d %c V %.6f\n",col,row,format[col][row],cellptr->v.value);
+                        fprintf(file,"%d %d %c V\n",col,row,format[col][row]);
+                        fprintf(file,"%.6f\n",cellptr->v.value);
                         break;
                     case FORMULA :
-                        fprintf(file,"%d %d %c F %.6f '%s'\n",col,row,format[col][row],cellptr->v.f.fvalue,cellptr->v.f.formula);
+                        fprintf(file,"%d %d %c F\n",col,row,format[col][row]);
+                        fprintf(file,"%.6f\n",cellptr->v.f.fvalue);
+                        fprintf(file,"%s\n",cellptr->v.f.formula);
                         break;
                 } /* switch */
             }

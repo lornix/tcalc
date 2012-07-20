@@ -64,6 +64,10 @@ int bioskey(int cmd __attribute__((unused)))
     }
     return key;
 }
+void refreshscreen()
+{
+    redrawwin(nwin);
+}
 int cputs(const char* str)
 {
     /* position cursor */
@@ -195,5 +199,5 @@ void window(int left, int top, int right, int bottom)
 }
 unsigned long coreleft(void)
 {
-    return 30*1024;
+    return 30*1024*1024;
 }
