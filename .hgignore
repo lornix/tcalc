@@ -9,3 +9,5 @@ config.log
 config.status
 
 Session.vim
+
+tcalc

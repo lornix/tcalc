@@ -162,5 +162,6 @@ int main(int argc, char *argv[])
     setcolor(LIGHTGRAY);
     clrscr();
     setcursor(oldcursor);
+    return 0;
 }
 

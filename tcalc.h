@@ -127,7 +127,7 @@ struct CELLREC
 
 typedef struct CELLREC *CELLPTR;
 
-#define memsize farcoreleft() - 1000
+#define memsize coreleft() - 1000
 #define textcellsize(s) (((strlen(s) >> 1) + 5) << 1)
 #define valuecellsize 16
 #define formulacellsize(s) (((strlen(s) >> 1) + 9) << 1)

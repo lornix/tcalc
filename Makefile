@@ -12,14 +12,14 @@ CFLAGS+=-O0
 #
 .PHONY: all clean
 
-OBJS=tcdisply tcinput tcommand tcparser tcutil tcalc
+OBJS=tcdisply tcinput tcommand tcparser tcutil tcalc compat
 
 all: tcalc
 
 %.o : %.c
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c $<
 
-tcalc: tcdisply.o tcinput.o tcommand.o tcparser.o tcutil.o
+tcalc: tcdisply.o tcinput.o tcommand.o tcparser.o tcutil.o tcalc.o compat.o
 
 clean:
 	-rm -f *.o $(OBJS)
