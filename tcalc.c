@@ -13,15 +13,14 @@ char changed = FALSE;
 char formdisplay = FALSE;
 char autocalc = TRUE;
 char stop = FALSE;
-char colortable[128];
 char colorcard;
 char snow;
 char *displayptr;
 long memleft;
 unsigned int oldcursor, shortcursor, tallcursor, nocursor = 0x2000;
 
+/* The main program loop */
 void run()
-    /* The main program loop */
 {
     int input;
 
@@ -139,7 +138,6 @@ void run()
 
 int main(int argc, char *argv[])
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     window(1, 1, 80, 25);
     initcursor();
     initcolortable();

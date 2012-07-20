@@ -165,7 +165,7 @@ int editstring(char *s, char *legal, int maxlength);
 int getint(int *number, int low, int high);
 void getinput(int c);
 void setcolor(int color);
-void scroll(int direction, int lines, int x1, int y1, int x2, int y2, int attrib);
+void tscroll(int direction, int lines, int x1, int y1, int x2, int y2, int attrib);
 void setcursor(unsigned int shape);
 void writef(int col, int row, int color, int width, char *format, ...);
 void printcol(void);
@@ -246,9 +246,12 @@ extern unsigned int oldcursor, shortcursor, tallcursor, nocursor;
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdarg.h>
 #include <ctype.h>
-#include <errno.h>
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <math.h>
-#include <stdarg.h>
-#include <string.h>
+#include <errno.h>
+#include <unistd.h>
+

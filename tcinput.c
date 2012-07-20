@@ -2,12 +2,11 @@
 
 #include "tcalc.h"
 
+/* Uses the BIOS to read the next keyboard character */
 int getkey(void)
-    /* Uses the BIOS to read the next keyboard character */
 {
     int key, lo, hi;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     key = bioskey(0);
     lo = key & 0X00FF;
     hi = (key & 0XFF00) >> 8;

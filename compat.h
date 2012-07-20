@@ -3,8 +3,9 @@
 #ifndef COMPAT_H
 #define COMPAT_H
 
+#define HUGE_VAL __DBL_MAX__
+#define O_BINARY        0x8000
 #define BLINK           128     /* blink bit */
-#define O_BINARY        0x8000  /* no translation       */
 enum text_modes { LASTMODE=-1, BW40=0, C40, BW80, C80, MONO=7, C4350=64 };
 enum COLORS {
     BLACK,   /* dark colors */
@@ -45,29 +46,11 @@ struct text_info {
 };
 
 char  *strupr(char *s);
-double acos(double x);
-double asin(double x);
-double atan(double x);
-double cos(double x);
-double cosh(double x);
-double exp(double x);
-double log(double x);
-double log10(double x);
-double pow(double x, double y);
-double pow10(double p);
-double sin(double x);
-double sinh(double x);
-double sqrt(double x);
-double tan(double x);
-double tanh(double x);
-int    access(const char *path, int amode);
+double pow10(double x);
 int    bioskey(int cmd);
-int    close(int handle);
 int    cputs(const char *str);
 int    int86(int intno, union REGS *inregs, union REGS *outregs);
 int    movetext(int left, int top, int right, int bottom, int destleft, int desttop);
-int    read(int handle, void *buf, unsigned len);
-int    write(int handle, void *buf, unsigned len);
 void   clrscr(void);
 void   gettextinfo(struct text_info *r);
 void   gotoxy(int x, int y);

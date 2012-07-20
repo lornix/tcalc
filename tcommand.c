@@ -13,7 +13,7 @@ void moverowup(void)
         currow--;
     else if (toprow != 0)
     {
-        scroll(DOWN, 1, LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
+        tscroll(DOWN, 1, LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
         displayrow(--toprow, NOUPDATE);
         currow--;
         setbottomrow();
@@ -29,7 +29,7 @@ void moverowdown(void)
         currow++;
     else if (bottomrow < (MAXROWS - 1))
     {
-        scroll(UP, 1, LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
+        tscroll(UP, 1, LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
         toprow++;
         currow++;
         setbottomrow();
@@ -56,7 +56,7 @@ void movecolleft(void)
         setrightcol();
         setleftcol();
         if (oldleftcol <= rightcol)
-            scroll(RIGHT, colstart[oldleftcol - leftcol] - LEFTMARGIN, LEFTMARGIN + 1,
+            tscroll(RIGHT, colstart[oldleftcol - leftcol] - LEFTMARGIN, LEFTMARGIN + 1,
                     3, 80, SCREENROWS + 2, WHITE);
         clearlastcol();
         for (col = leftcol; col <= oldleftcol - 1; col++)
@@ -84,7 +84,7 @@ void movecolright(void)
         setleftcol();
         setrightcol();
         if (oldrightcol >= leftcol)
-            scroll(LEFT, oldcolstart[leftcol - oldleftcol] - LEFTMARGIN,
+            tscroll(LEFT, oldcolstart[leftcol - oldleftcol] - LEFTMARGIN,
                     LEFTMARGIN + 1, 3, 80, SCREENROWS + 2, WHITE);
         clearlastcol();
         for (col = oldrightcol + 1; col <= rightcol; col++)

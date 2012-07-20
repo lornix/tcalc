@@ -282,14 +282,13 @@ void setleftcol(void)
     printcol();
 } /* setleftcol */
 
+/* Sets the value of rightcol based on the value of leftcol */
 void setrightcol(void)
-    /* Sets the value of rightcol based on the value of leftcol */
 {
     int total = LEFTMARGIN, col = 0;
 
     fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
-    do
-    {
+    do {
         colstart[col] = total;
         total += colwidth[leftcol + col++];
     }
@@ -527,9 +526,9 @@ void valuestring(CELLPTR cellptr, double value, char *vstring, int col,
     }
 } /* valuestring */
 
+/* Creates an output string for the data in the cell in (col, row), and
+    also returns the color of the cell */
 char *cellstring(int col, int row, int *color, int formatting)
-    /* Creates an output string for the data in the cell in (col, row), and
-       also returns the color of the cell */
 {
     CELLPTR cellptr = cell[col][row];
     int newcol, formatvalue;
@@ -537,16 +536,12 @@ char *cellstring(int col, int row, int *color, int formatting)
     char *p;
     double value;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
-    if (cellptr == NULL)
-    {
-        if (!formatting || (format[col][row] < OVERWRITE))
-        {
+    if (cellptr == NULL) {
+        if (!formatting || (format[col][row] < OVERWRITE)) {
             sprintf(s, "%*s", colwidth[col], "");
             *color = BLANKCOLOR;
         }
-        else
-        {
+        else {
             newcol = col;
             while (cell[--newcol][row] == NULL);
             p = cell[newcol][row]->v.text;
@@ -555,7 +550,7 @@ char *cellstring(int col, int row, int *color, int formatting)
             strncpy(temp, p, colwidth[col]);
             temp[colwidth[col]] = 0;
             /* sprintf(s, "%s%*s", temp, colwidth[col] - strlen(temp), ""); */
-            sprintf(s, "%-*s", colwidth[col],temp);
+            sprintf(s, "%*s", -colwidth[col],temp);
             *color = TEXTCOLOR;
         }
     }
@@ -618,10 +613,9 @@ void checkforsave(void)
         savesheet();
 } /* checkforsave */
 
+/* Initializes various global variables */
 void initvars(void)
-    /* Initializes various global variables */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     leftcol = toprow = curcol = currow = lastcol = lastrow = 0;
     setmem(colwidth, sizeof(colwidth), DEFAULTWIDTH);
     setmem(cell, sizeof(cell), 0);
@@ -634,7 +628,7 @@ int getcommand(char *msgstr, char *comstr)
     int ch, counter, len = strlen(msgstr);
 
     fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
-    scroll(UP, 0, 1, 24, 80, 24, WHITE);
+    tscroll(UP, 0, 1, 24, 80, 24, WHITE);
     for (counter = 0; counter < len; counter++)
     {
         if (isupper(msgstr[counter]))

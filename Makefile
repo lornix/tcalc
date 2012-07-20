@@ -4,22 +4,24 @@
 #    Last modified **********
 #
 CFLAGS+=-ggdb3
-CFLAGS+=-Wall -Wextra -Wundef
+CFLAGS+=-Wall -Wextra -Wunused
 CFLAGS+=-Werror
 CFLAGS+=-O0
+# CFLAGS+=-nostdlib
 #
-# LDFLAGS+=-lm
+LDFLAGS+=-lm
+LDFLAGS+=-lncurses
+# LDFLAGS+=-lgcc
 #
 .PHONY: all clean
 
-OBJS=tcdisply tcinput tcommand tcparser tcutil tcalc compat
-
 all: tcalc
 
-%.o : %.c
+tcalc: tcdisply.o tcinput.o tcommand.o tcparser.o tcutil.o tcalc.o compat.o
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
+
+%.o : %.c tcalc.h compat.h
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c $<
 
-tcalc: tcdisply.o tcinput.o tcommand.o tcparser.o tcutil.o tcalc.o compat.o
-
 clean:
-	-rm -f *.o $(OBJS)
+	-rm -f *.o tcalc

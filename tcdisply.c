@@ -4,21 +4,19 @@
 
 static unsigned char colortable[256];
 
+/* Sets the current color using the color table */
 void setcolor(int color)
-    /* Sets the current color using the color table */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     textattr(colortable[color]);
 } /* setcolor */
 
+/* Prints a string in video memory at a selected location in a color */
 void writef(int col, int row, int color, int width, char *format, ...)
-    /* Prints a string in video memory at a selected location in a color */
 {
     va_list arg_ptr;
     char output[81];
     int len;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     va_start(arg_ptr, format);
     vsprintf(output, format, arg_ptr);
     output[width] = 0;
@@ -29,9 +27,8 @@ void writef(int col, int row, int color, int width, char *format, ...)
     cputs(output);
 } /* writef */
 
-void scroll(int direction, int lines, int x1, int y1, int x2, int y2,
-        int attrib)
-    /* Scrolls an area of the screen */
+/* Scrolls an area of the screen */
+void tscroll(int direction, int lines, int x1, int y1, int x2, int y2, int attrib)
 {
     fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (lines == 0)
@@ -58,25 +55,23 @@ void scroll(int direction, int lines, int x1, int y1, int x2, int y2,
     setcolor(attrib);
     clrscr();
     window(1, 1, 80, 25);
-} /* scroll */
+} /* tscroll */
 
+/* Sets the shape of the cursor */
 void setcursor(unsigned int shape)
-    /* Sets the shape of the cursor */
 {
     union REGS reg;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     reg.h.ah = 1;
     reg.x.cx = shape;
     int86(0X10, &reg, &reg);
 } /* setcursor */
 
+/* Returns the shape of the current cursor */
 unsigned int getcursor(void)
-    /* Returns the shape of the current cursor */
 {
     union REGS reg;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     reg.h.ah = 3;
     reg.h.bh = 0;
     int86(0X10, &reg, &reg);
@@ -93,14 +88,14 @@ void changecursor(int insmode)
         setcursor(shortcursor);
 } /* changecursor */
 
+/* Prints the column headings */
 void printcol(void)
-    /* Prints the column headings */
 {
     int col;
     char colstr[MAXCOLWIDTH + 1];
 
     fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
-    scroll(UP, 0, 1, 2, 80, 2, HEADERCOLOR);
+    tscroll(UP, 0, 1, 2, 80, 2, HEADERCOLOR);
     for (col = leftcol; col <= rightcol; col++)
     {
         centercolstring(col, colstr);
@@ -115,7 +110,7 @@ void clearlastcol()
 
     fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if ((col = colstart[rightcol - leftcol] + colwidth[rightcol]) < 80)
-        scroll(UP, 0, col + 1, 3, 80, SCREENROWS + 2, WHITE);
+        tscroll(UP, 0, col + 1, 3, 80, SCREENROWS + 2, WHITE);
 } /* clearlastcol */
 
 void printrow(void)
@@ -134,7 +129,8 @@ void displaycell(int col, int row, int highlighting, int updating)
     int color;
     char *s;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
+    fprintf(stderr,"%s: %s (%d): %d,%d %d/%d\n",__FILE__,__FUNCTION__,__LINE__,
+            col,row,highlighting,updating);
     if ((updating) &&
             ((cell[col][row] == NULL) || (cell[col][row]->attrib != FORMULA)))
         return;
@@ -185,7 +181,7 @@ void clearinput(void)
     /* Clears the input line */
 {
     fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
-    scroll(UP, 0, 1, 25, 80, 25, WHITE);
+    tscroll(UP, 0, 1, 25, 80, 25, WHITE);
     gotoxy(1, 25);
 } /* clearinput */
 
@@ -223,7 +219,6 @@ void showcelltype(void)
 /* Displays the entire screen */
 void redrawscreen(void)
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     setrightcol();
     setbottomrow();
     writef(1, 1, MSGMEMORYCOLOR, strlen(MSGMEMORY), MSGMEMORY);
@@ -234,12 +229,11 @@ void redrawscreen(void)
     displayscreen(NOUPDATE);
 }
 
+/* Initializes the different cursor types */
 void initcursor(void)
-    /* Initializes the different cursor types */
 {
     struct text_info ti;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     gettextinfo(&ti);
     oldcursor = getcursor();
     if (ti.currmode == MONO)
@@ -254,13 +248,12 @@ void initcursor(void)
     }
 } /* initcursor */
 
+/* Sets up the color table */
 void initcolortable(void)
-    /* Sets up the color table */
 {
     int color, fg, bg, fcolor, bcolor;
     struct text_info ti;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     gettextinfo(&ti);
     if (ti.currmode == C80)
     {
