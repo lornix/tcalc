@@ -8,7 +8,6 @@ int alloctext(int col, int row, char *s)
     int size;
     CELLPTR cellptr;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (memleft < (size = textcellsize(s)))
         return(FALSE);
     memleft -= size;
@@ -24,7 +23,6 @@ int allocvalue(int col, int row, double amt)
 {
     CELLPTR cellptr;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (memleft < valuecellsize)
         return(FALSE);
     memleft -= valuecellsize;
@@ -41,7 +39,6 @@ int allocformula(int col, int row, char *s, double amt)
     int size;
     CELLPTR cellptr;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (memleft < (size = formulacellsize(s)))
         return(FALSE);
     memleft -= size;
@@ -58,7 +55,6 @@ void deletecell(int col, int row, int display)
 {
     CELLPTR cellptr = cell[col][row];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (cellptr == NULL)
         return;
     switch (cellptr->attrib)
@@ -88,14 +84,12 @@ void deletecell(int col, int row, int display)
 void printfreemem(void)
     /* Prints the amount of free memory */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     writef(strlen(MSGMEMORY) + 2, 1, MEMORYCOLOR, 6, "%6ld", memleft);
 } /* printfreemem */
 
 int rowwidth(int row)
     /* Returns the width in spaces of row */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     return((row == 0) ? 1 : (int)log10(row + 1) + 1);
 } /* rowwidth */
 
@@ -107,7 +101,6 @@ int formulastart(char **input, int *col, int *row)
     int len, maxlen = rowwidth(MAXROWS);
     char *start, numstring[10];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (!isalpha(**input))
         return(FALSE);
     *col = *((*input)++) - 'A';
@@ -140,7 +133,6 @@ int formulastart(char **input, int *col, int *row)
 void errormsg(char *s)
     /* Prints an error message at the bottom of the screen */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     printf("%c", 7);      /* Beeps the speaker */
     writef(1, 25, ERRORCOLOR, 79, "%s  %s", s, MSGKEYPRESS);
     gotoxy(strlen(s) + strlen(MSGKEYPRESS) + 3, 25);
@@ -158,7 +150,6 @@ void fixformula(int col, int row, int action, int place)
     CELLPTR cellptr = cell[col][row];
     double value;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     strcpy(newformula, cellptr->v.f.formula);
     while (*curpos != 0)
     {
@@ -234,7 +225,6 @@ void fixformula(int col, int row, int action, int place)
 void colstring(int col, char *colstr)
     /* Changes a column number to a string */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     setmem(colstr, 3, 0);
     if (col < 26)
         colstr[0] = col + 'A';
@@ -251,7 +241,6 @@ void centercolstring(int col, char *colstr)
     char s[3];
     int spaces1, spaces2;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     colstring(col, s);
     spaces1 = (colwidth[col] - strlen(s)) >> 1;
     spaces2 = colwidth[col] - strlen(s) - spaces1;
@@ -263,7 +252,6 @@ void setleftcol(void)
 {
     int total = 80, col = 0;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     while ((total >= LEFTMARGIN) && (rightcol - col >= 0))
     {
         colstart[SCREENCOLS - col - 1] = total - colwidth[rightcol - col];
@@ -287,7 +275,6 @@ void setrightcol(void)
 {
     int total = LEFTMARGIN, col = 0;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     do {
         colstart[col] = total;
         total += colwidth[leftcol + col++];
@@ -300,7 +287,6 @@ void setrightcol(void)
 void settoprow(void)
     /* Figures out the value of toprow based on the value of bottomrow */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (bottomrow - SCREENROWS < -1)
         bottomrow = 19;
     toprow = bottomrow - 19;
@@ -310,7 +296,6 @@ void settoprow(void)
 void setbottomrow(void)
     /* Figures out the value of bottomrow based on the value of toprow */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (toprow + SCREENROWS > MAXROWS)
         toprow = MAXROWS - 20;
     bottomrow = toprow + 19;
@@ -322,7 +307,6 @@ void setlastcol(void)
 {
     register int row, col;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (col = lastcol; col >= 0; col--)
     {
         for (row = 0; row <= lastrow; row++)
@@ -342,7 +326,6 @@ void setlastrow(void)
 {
     register int row, col;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (row = lastrow; row >= 0; row--)
     {
         for (col = 0; col <= lastcol; col++)
@@ -363,7 +346,6 @@ void act(char *s)
     int attrib, allocated;
     double value;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     deletecell(curcol, currow, UPDATE);
     value = parse(s, &attrib);
     switch(attrib)
@@ -405,7 +387,6 @@ int setoflags(int col, int row, int display)
 {
     int len;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     len = strlen(cell[col][row]->v.text) - colwidth[col];
     while ((++col < MAXCOLS) && (len > 0) && (cell[col][row] == NULL))
     {
@@ -420,7 +401,6 @@ int setoflags(int col, int row, int display)
 void clearoflags(int col, int row, int display)
     /* Clears the overwrite flag on cells starting at (col, row) */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     while ((format[col][row] >= OVERWRITE) && (col < MAXCOLS) &&
             (cell[col][row] == NULL))
     {
@@ -431,14 +411,17 @@ void clearoflags(int col, int row, int display)
     }
 } /* clearoflags */
 
+/* Starting in col, moves back to the last TEXT cell and updates all flags */
 void updateoflags(int col, int row, int display)
-    /* Starting in col, moves back to the last TEXT cell and updates all flags */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     while ((cell[col][row] == NULL) && (col-- > 0));
-    if ((cell[col][row] != NULL) && (cell[col][row]->attrib == TEXT) && 
-            (col >= 0))
-        setoflags(col, row, display);
+    if (cell[col][row] != NULL) {
+        if (cell[col][row]->attrib == TEXT) {
+            if (col >= 0) {
+                setoflags(col, row, display);
+            }
+        }
+    }
 } /* updateoflags */
 
 void textstring(char *instring, char *outstring, int col, int fvalue,
@@ -447,7 +430,6 @@ void textstring(char *instring, char *outstring, int col, int fvalue,
 {
     char *just, *ljust = "%-*s", *rjust = "%*s";
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if ((fvalue & RJUSTIFY) && (formatting))
         just = rjust;
     else
@@ -465,7 +447,6 @@ void valuestring(CELLPTR cellptr, double value, char *vstring, int col,
     char *fstring;
     int width, pos;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (value == HUGE_VAL)
     {
         strcpy(vstring, MSGERROR);
@@ -586,7 +567,6 @@ char *cellstring(int col, int row, int *color, int formatting)
 void writeprompt(char *prompt)
     /* Prints a prompt on the screen */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     writef(1, 24, PROMPTCOLOR, 80, prompt);
 } /* writeprompt */
 
@@ -595,7 +575,6 @@ void swap(int *val1, int *val2)
 {
     int temp;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     temp = *val1;
     *val1 = *val2;
     *val2 = temp;
@@ -608,7 +587,6 @@ void checkforsave(void)
 {
     int save;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (changed && getyesno(&save, MSGSAVESHEET) && (save == 'Y'))
         savesheet();
 } /* checkforsave */
@@ -627,7 +605,6 @@ int getcommand(char *msgstr, char *comstr)
 {
     int ch, counter, len = strlen(msgstr);
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     tscroll(UP, 0, 1, 24, 80, 24, WHITE);
     for (counter = 0; counter < len; counter++)
     {

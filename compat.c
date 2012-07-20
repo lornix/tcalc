@@ -67,9 +67,8 @@ int bioskey(int cmd __attribute__((unused)))
 int cputs(const char* str)
 {
     /* position cursor */
-    move(master_text_info.cury,master_text_info.curx);
     attrset(COLOR_PAIR(master_text_info.attribute));
-    addstr(str);
+    mvaddstr(master_text_info.cury,master_text_info.curx,str);
     refresh();
     return 0;
 }
@@ -94,10 +93,12 @@ int int86(int intno, union REGS* inregs, union REGS* outregs)
 }
 int movetext(int left, int top, int right, int bottom, int destleft, int desttop)
 {
-    gotoxy(top,left);
-    cputs("from here");
-    gotoxy(destleft,desttop);
-    cputs("to here");
+    /*
+     * gotoxy(top,left);
+     * cputs("from here");
+     * gotoxy(destleft,desttop);
+     * cputs("to here");
+     */
     return top+right+bottom+destleft+left+desttop;
 }
 void clrscr(void)
@@ -194,5 +195,5 @@ void window(int left, int top, int right, int bottom)
 }
 unsigned long coreleft(void)
 {
-    return 4*1024*1024;
+    return 30*1024;
 }

@@ -7,7 +7,6 @@ char *name = MSGNAME;
 void moverowup(void)
     /* Moves up 1 row */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
     if (currow > toprow)
         currow--;
@@ -23,7 +22,6 @@ void moverowup(void)
 void moverowdown(void)
     /* Moves down one row */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
     if (currow < bottomrow)
         currow++;
@@ -43,7 +41,6 @@ void movecolleft(void)
     int col, oldleftcol;
     unsigned char oldcolstart[SCREENCOLS];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     oldleftcol = leftcol;
     movmem(colstart, oldcolstart, sizeof(colstart));
     displaycell(curcol, currow, NOHIGHLIGHT, NOUPDATE);
@@ -70,7 +67,6 @@ void movecolright(void)
     int col, oldleftcol, oldrightcol;
     unsigned char oldcolstart[SCREENCOLS];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     movmem(colstart, oldcolstart, sizeof(colstart));
     oldleftcol = leftcol;
     oldrightcol = rightcol;
@@ -97,7 +93,6 @@ void recalc(void)
 {
     int col, row, dummy;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (col = 0; col <= lastcol; col++)
     {
         for (row = 0; row <= lastrow; row++)
@@ -114,7 +109,6 @@ void changeautocalc(int newmode)
 {
     char s[15];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (!autocalc && newmode)
         recalc();
     autocalc = newmode;
@@ -130,7 +124,6 @@ void changeformdisplay(int newmode)
 {
     char s[15];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     formdisplay = newmode;
     if (formdisplay)
         strcpy(s, MSGFORMDISPLAY);
@@ -144,7 +137,6 @@ void editcell(CELLPTR ecell)
 {
     char s[MAXINPUT + 1];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (ecell == NULL)
         return;
     switch(ecell->attrib)
@@ -173,7 +165,6 @@ void clearsheet(void)
 {
     int col, row;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (row = 0; row <= lastrow; row++)
     {
         for (col = 0; col <= lastcol; col++)
@@ -195,7 +186,6 @@ void loadsheet(char *filename)
     int size, allocated, reallastcol = 0, reallastrow = 0, file;
     char check[81];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (filename[0] == 0)
     {
         writeprompt(MSGFILENAME);
@@ -282,7 +272,6 @@ void savesheet(void)
     int size, col, row, overwrite, file;
     CELLPTR cellptr;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     filename[0] = 0;
     writeprompt(MSGFILENAME);
     if (!editstring(filename, "", MAXINPUT))
@@ -345,7 +334,6 @@ int pagerows(int row, int toppage, int border)
 {
     int rows;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     rows = toppage ? 66 - TOPMARGIN : 66;
     if (border)
         rows--;
@@ -361,7 +349,6 @@ int pagecols(int col, int border, int columns)
     int len = ((col == 0) && (border)) ? columns - LEFTMARGIN : columns;
     int firstcol = col;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     while ((len > 0) && (col <= lastcol))
         len -= colwidth[col++];
     if (len < 0)
@@ -377,7 +364,6 @@ void printsheet(void)
     int columns, counter1, counter2, counter3, col = 0, row, border, toppage,
         lcol, lrow, dummy, printed, oldlastcol;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     filename[0] = 0;
     writeprompt(MSGPRINT);
     if (!editstring(filename, "", MAXINPUT))
@@ -462,7 +448,6 @@ void setcolwidth(int col)
 {
     int width, row;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     writeprompt(MSGCOLWIDTH);
     if (!getint(&width, MINCOLWIDTH, MAXCOLWIDTH))
         return;
@@ -489,7 +474,6 @@ void setcolwidth(int col)
 void gotocell()
     /* Moves to a selected cell */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     writeprompt(MSGGOTO);
     if (!getcell(&curcol, &currow))
         return;
@@ -506,7 +490,6 @@ void formatcells(void)
 {
     int col, row, col1, col2, row1, row2, temp, newformat = 0;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     writeprompt(MSGCELL1);
     if (!getcell(&col1, &row1))
         return;
@@ -558,7 +541,6 @@ void deletecol(int col)
 {
     int counter, row;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (counter = 0; counter <= lastrow; counter++)
         deletecell(col, counter, NOUPDATE);
     printfreemem();
@@ -602,7 +584,6 @@ void insertcol(int col)
 {
     int counter, row;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (lastcol == MAXCOLS - 1)
     {
         for (counter = 0; counter <= lastrow; counter++)
@@ -648,7 +629,6 @@ void deleterow(int row)
 {
     int counter, rowc;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (counter = 0; counter <= lastcol; counter++)
         deletecell(counter, row, NOUPDATE);
     printfreemem();
@@ -691,7 +671,6 @@ void insertrow(int row)
 {
     int counter, rowc;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (lastrow == MAXROWS - 1)
     {
         for (counter = 0; counter <= lastcol; counter++)
@@ -734,7 +713,6 @@ void smenu(void)
 {
     char filename[MAXINPUT + 1];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     filename[0] = 0;
     switch(getcommand(SMENU, SCOMMAND))
     {
@@ -758,7 +736,6 @@ void smenu(void)
 void cmenu(void)
     /* Executes the commands in the column menu */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     switch(getcommand(CMENU, CCOMMAND))
     {
         case 0 :
@@ -776,7 +753,6 @@ void cmenu(void)
 void rmenu(void)
     /* Executes the commands in the row menu */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     switch(getcommand(RMENU, RCOMMAND))
     {
         case 0 :
@@ -791,7 +767,6 @@ void rmenu(void)
 void umenu(void)
     /* Executes the commands in the utility menu */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     switch(getcommand(UMENU, UCOMMAND))
     {
         case 0 :
@@ -807,7 +782,6 @@ void umenu(void)
 void mainmenu(void)
     /* Executes the commands in the main menu */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     switch(getcommand(MENU, COMMAND))
     {
         case 0 :

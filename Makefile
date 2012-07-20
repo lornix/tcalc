@@ -24,4 +24,4 @@ tcalc: tcdisply.o tcinput.o tcommand.o tcparser.o tcutil.o tcalc.o compat.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ -c $<
 
 clean:
-	-rm -f *.o tcalc
+	-rm -f *.o tcalc core

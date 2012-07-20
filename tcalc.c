@@ -24,7 +24,6 @@ void run()
 {
     int input;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     do
     {
         displaycell(curcol, currow, HIGHLIGHT, NOUPDATE);

@@ -20,7 +20,6 @@ int editstring(char *s, char *legal, int maxlength)
 {
     int c, len = strlen(s), pos = len, insert = TRUE;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     changecursor(insert);
     do
     {
@@ -102,7 +101,6 @@ void getinput(int c)
 {
     char s[MAXINPUT + 1];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     s[0] = c;
     s[1] = 0;
     if (!editstring(s, "", MAXINPUT) || (s[0] == 0))
@@ -117,7 +115,6 @@ int getint(int *number, int low, int high)
     int i, good = FALSE;
     char s[5], message[81];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     s[0] = 0;
     sprintf(message, MSGBADNUMBER, low, high);
     do
@@ -140,7 +137,6 @@ int getcell(int *col, int *row)
         oldcol = *col, oldrow = *row;
     char data[10], *input, *start, numstring[6];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     data[0] = 0;
     do
     {
@@ -188,7 +184,6 @@ int getyesno(int *yesno, char *prompt)
        pressed, FALSE if not.
      */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     writeprompt(prompt);
     setcursor(shortcursor);
     do

@@ -30,7 +30,6 @@ void writef(int col, int row, int color, int width, char *format, ...)
 /* Scrolls an area of the screen */
 void tscroll(int direction, int lines, int x1, int y1, int x2, int y2, int attrib)
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (lines == 0)
         window(x1, y1, x2, y2);
     else switch(direction)
@@ -81,7 +80,6 @@ unsigned int getcursor(void)
 void changecursor(int insmode)
     /* Changes the cursor shape based on the current insert mode */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if (insmode)
         setcursor(tallcursor);
     else
@@ -94,7 +92,6 @@ void printcol(void)
     int col;
     char colstr[MAXCOLWIDTH + 1];
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     tscroll(UP, 0, 1, 2, 80, 2, HEADERCOLOR);
     for (col = leftcol; col <= rightcol; col++)
     {
@@ -108,7 +105,6 @@ void clearlastcol()
 {
     int col;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     if ((col = colstart[rightcol - leftcol] + colwidth[rightcol]) < 80)
         tscroll(UP, 0, col + 1, 3, 80, SCREENROWS + 2, WHITE);
 } /* clearlastcol */
@@ -118,7 +114,6 @@ void printrow(void)
 {
     int row;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (row = 0; row < SCREENROWS; row++)
         writef(1, row + 3, HEADERCOLOR, LEFTMARGIN, "%-d", row + toprow + 1);
 } /* printrow */
@@ -129,8 +124,6 @@ void displaycell(int col, int row, int highlighting, int updating)
     int color;
     char *s;
 
-    fprintf(stderr,"%s: %s (%d): %d,%d %d/%d\n",__FILE__,__FUNCTION__,__LINE__,
-            col,row,highlighting,updating);
     if ((updating) &&
             ((cell[col][row] == NULL) || (cell[col][row]->attrib != FORMULA)))
         return;
@@ -151,7 +144,6 @@ void displaycol(int col, int updating)
 {
     int row;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (row = toprow; row <= bottomrow; row++)
         displaycell(col, row, NOHIGHLIGHT, updating);
 } /* displaycol */
@@ -161,7 +153,6 @@ void displayrow(int row, int updating)
 {
     int col;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (col = leftcol; col <= rightcol; col++)
         displaycell(col, row, NOHIGHLIGHT, updating);
 } /* displayrow */
@@ -171,7 +162,6 @@ void displayscreen(int updating)
 {
     int row;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     for (row = toprow; row <= bottomrow; row++)
         displayrow(row, updating);
     clearlastcol();
@@ -180,7 +170,6 @@ void displayscreen(int updating)
 void clearinput(void)
     /* Clears the input line */
 {
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     tscroll(UP, 0, 1, 25, 80, 25, WHITE);
     gotoxy(1, 25);
 } /* clearinput */
@@ -191,7 +180,6 @@ void showcelltype(void)
     char colstr[3], *s;
     int color;
 
-    fprintf(stderr,"%s: %s (%d)\n",__FILE__,__FUNCTION__,__LINE__);
     formdisplay = !formdisplay;
     s = cellstring(curcol, currow, &color, NOFORMAT);
     colstring(curcol, colstr);
