@@ -33,11 +33,12 @@ static struct TOKENREC stack[PARSERSTACKSIZE], curtoken;
 int stacktop, tokentype, error;
 char *input, isformula;
 
-int matherr(struct exception *e)
-{
-    e->retval = HUGE_VAL;
-    return(1);
-} /* matherr */
+/* removed, not referenced anywhere */
+// int matherr(struct exception *e)
+// {
+//     e->retval = HUGE_VAL;
+//     return(1);
+// } /* matherr */
 
 int isfunc(char *s)
     /* Returns TRUE if the string is a legal function, FALSE otherwise. */
