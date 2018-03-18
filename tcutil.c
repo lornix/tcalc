@@ -506,10 +506,10 @@ char *cellstring(int col, int row, int *color, int formatting)
                 if (formdisplay) {
                     textstring(cellptr->v.f.formula, s, col, formatvalue, formatting);
                     *color = FORMULACOLOR;
-                    break;
                 }
                 else
                     value = cellptr->v.f.fvalue;
+                break;
             case VALUE :
                 if (cellptr->attrib == VALUE)
                     value = cellptr->v.value;
